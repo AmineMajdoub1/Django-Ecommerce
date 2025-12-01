@@ -209,3 +209,14 @@ if 'RAILWAY_STATIC_URL' in os.environ or not DEBUG:
 # Whitenoise settings for better performance
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_MANIFEST_STRICT = False
+# Auto-create admin on Railway
+import os
+if os.environ.get("RAILWAY_ENVIRONMENT") and os.environ.get("CREATE_ADMIN", "False") == "True":
+    try:
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        if not User.objects.filter(username="admin").exists():
+            User.objects.create_superuser("admin", "admin@lecisele.com", "AdminPassword123")
+            print(">>> Admin user created on Railway!")
+    except Exception as e:
+        print(f">>> Error creating admin: {e}")
