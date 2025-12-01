@@ -3,6 +3,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn ecom.wsgi --log-file -"
+    "startCommand": "python manage.py collectstatic --noinput --clear && python manage.py migrate && gunicorn ecom.wsgi --log-file -"
   }
 }
