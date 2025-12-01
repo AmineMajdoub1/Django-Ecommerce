@@ -15,12 +15,27 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ========== LOAD ENVIRONMENT VARIABLES ==========
-dotenv_path = BASE_DIR / ".env"
-if os.path.exists(dotenv_path):
-    load_dotenv(dotenv_path, override=True)
-    print(">>> Loaded local .env file")
-else:
-    print(">>> No .env file found, using Railway environment variables")
+# Try to load .env file if exists, but don't require dotenv package
+try:
+    from dotenv import load_dotenv
+    dotenv_path = BASE_DIR / ".env"
+    if os.path.exists(dotenv_path):
+        load_dotenv(dotenv_path, override=True)
+        print(">>> Loaded local .env file")
+    else:
+        print(">>> No .env file found")
+except ImportError:
+    # dotenv not installed, use environment variables directly
+    print(">>> Using environment variables directly")
+    pass
+
+# Import dj-database-url with fallback
+try:
+    import dj_database_url
+    DJ_DATABASE_URL_AVAILABLE = True
+except ImportError:
+    DJ_DATABASE_URL_AVAILABLE = False
+    print(">>> Warning: dj-database-url not available")
 
 # ========== SECURITY SETTINGS ==========
 SECRET_KEY = os.environ.get('SECRET_KEY', 'change-this-in-production-12345')
