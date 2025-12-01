@@ -256,3 +256,28 @@ if IS_RAILWAY and os.environ.get('CREATE_ADMIN', 'True') == 'True':
 # ========== FIX PAGINATION WARNING ==========
 # Add default ordering to avoid warning
 SILENCED_SYSTEM_CHECKS = ['models.W042']
+# ========== CREATE ADMIN AFTER SETUP ==========
+import sys
+
+# Only run when starting server
+if "gunicorn" in sys.argv or "runserver" in sys.argv:
+    # Delay import until Django is ready
+    import threading
+    import time
+    
+    def delayed_admin_creation():
+        time.sleep(5)  # Wait for Django to be ready
+        try:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            if not User.objects.filter(username="admin").exists():
+                User.objects.create_superuser("admin", "admin@lecisele.com", "AdminPassword123")
+                print(">>> Admin user created successfully!")
+            else:
+                print(">>> Admin user already exists")
+        except Exception as e:
+            print(f">>> Admin creation skipped: {e}")
+    
+    # Run in background thread
+    thread = threading.Thread(target=delayed_admin_creation, daemon=True)
+    thread.start()
