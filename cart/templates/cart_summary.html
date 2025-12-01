@@ -1,0 +1,326 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<!-- ==================== PREMIUM CART HEADER ==================== -->
+<header class="premium-cart-hero-section">
+  <div class="hero-background">
+    <div class="background-elements">
+      <div class="floating-element el-1"></div>
+      <div class="floating-element el-2"></div>
+      <div class="floating-element el-3"></div>
+      <div class="floating-element el-4"></div>
+    </div>
+    <div class="gradient-overlay"></div>
+  </div>
+  
+  <div class="container">
+    <div class="hero-content">
+      <div class="brand-presentation">
+        <div class="logo-glow"></div>
+        <h1 class="brand-title">
+          <span class="title-main">Shopping Cart</span>
+          <span class="title-subtitle">CURATED SELECTION</span>
+        </h1>
+        <div class="hero-divider">
+          <div class="divider-line"></div>
+          <div class="divider-dot"></div>
+          <div class="divider-line"></div>
+        </div>
+        <p class="hero-tagline">Review your exquisite selections</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== CART CONTENT ==================== -->
+<section class="premium-cart-section py-6">
+  <div class="container">
+    {% if cart_products %}
+      <div class="cart-content">
+        <!-- Cart Items -->
+        <div class="cart-items">
+          {% for product in cart_products %}
+          <div class="premium-cart-item fade-in-up">
+            <!-- Product Image -->
+            <div class="cart-item-image">
+              <img src="{{ product.image.url }}" alt="{{ product.name }}" class="premium-image">
+              {% if product.is_sale %}
+              <div class="product-badge sale-badge">
+                <i class="bi bi-tag"></i>
+                Sale
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Product Details -->
+            <div class="cart-item-details">
+              <h4 class="product-name">{{ product.name }}</h4>
+              <p class="product-description">{{ product.description }}</p>
+              
+              <!-- Display Selected Size -->
+              {% for key, item_data in cart_details.items %}
+                {% if key == product.id|slugify and item_data.selected_size %}
+                <div class="selected-size-info">
+                  <strong>Selected Size: </strong>
+                  {% if item_data.selected_size == 'custom' and item_data.custom_size %}
+                    Custom: {{ item_data.custom_size }}
+                  {% else %}
+                    {{ item_data.selected_size }}
+                  {% endif %}
+                </div>
+                {% endif %}
+              {% endfor %}
+
+              <div class="product-specs">
+                {% if product.size %}
+                <div class="spec-item">
+                  <span class="spec-label">Size:</span>
+                  <span class="spec-value">{{ product.size }}</span>
+                </div>
+                {% endif %}
+                {% if product.color %}
+                <div class="spec-item">
+                  <span class="spec-label">Color:</span>
+                  <span class="spec-value">{{ product.color }}</span>
+                </div>
+                {% endif %}
+                {% if product.material %}
+                <div class="spec-item">
+                  <span class="spec-label">Material:</span>
+                  <span class="spec-value">{{ product.material }}</span>
+                </div>
+                {% endif %}
+              </div>
+
+              <!-- Price -->
+              <div class="product-price">
+                {% if product.is_sale %}
+                <div class="price-container">
+                  <span class="price-old">${{ product.price }}</span>
+                  <span class="price-new">${{ product.sale_price }}</span>
+                </div>
+                {% else %}
+                <span class="price-current">${{ product.price }}</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Quantity & Actions -->
+            <div class="cart-item-actions">
+              <div class="quantity-section">
+                <label class="quantity-label">Quantity:</label>
+                <select class="quantity-select" id="select{{product.id}}">
+                  {% for key, value in quantities.items %}
+                    {% if key == product.id|slugify %}
+                      <option selected>{{ value }}</option>
+                    {% endif %}
+                  {% endfor %}
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+              </div>
+
+              <div class="action-buttons">
+                <button type="button" data-index="{{product.id}}" class="btn-premium btn-update">
+                  <i class="bi bi-arrow-repeat"></i>
+                  Update
+                </button>
+                <button type="button" data-index="{{product.id}}" class="btn-premium-outline btn-remove">
+                  <i class="bi bi-trash"></i>
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Cart Summary - FIXED VISIBILITY -->
+        <div class="cart-summary">
+          <div class="premium-card summary-card">
+            <h3 class="summary-title" style="color: #ffffff !important;">Order Summary</h3>
+            <div class="summary-total">
+              <span class="total-label" style="color: #ffffff !important;">Total Amount:</span>
+              <span class="total-amount" style="color: #C6A664 !important;">${{ totals }}</span>
+            </div>
+            <div class="summary-features">
+              <div class="feature-item" style="color: #a0a0a0 !important;">
+                <i class="bi bi-shield-check" style="color: #C6A664 !important;"></i>
+                <span style="color: #a0a0a0 !important;">Secure Checkout</span>
+              </div>
+              <div class="feature-item" style="color: #a0a0a0 !important;">
+                <i class="bi bi-truck" style="color: #C6A664 !important;"></i>
+                <span style="color: #a0a0a0 !important;">Premium Shipping</span>
+              </div>
+              
+            </div>
+            <a href="{% url 'checkout' %}" class="btn-premium full-width" style="color: #2C2C2C !important;">
+              <i class="bi bi-credit-card"></i>
+              Proceed to Checkout
+            </a>
+            <a href="{% url 'home' %}" class="btn-premium-outline full-width" style="color: #C6A664 !important;">
+              <i class="bi bi-arrow-left"></i>
+              Continue Shopping
+            </a>
+          </div>
+        </div>
+      </div>
+
+    {% else %}
+      <!-- Empty Cart State -->
+      <div class="empty-cart">
+        <div class="empty-content">
+          <div class="empty-icon-container">
+            <i class="bi bi-cart empty-icon"></i>
+            <div class="empty-glow"></div>
+          </div>
+          <h3 class="empty-title">Your Cart is Empty</h3>
+          <p class="empty-subtitle">
+            Discover our exquisite collection and add pieces that speak to your style
+          </p>
+          <div class="empty-actions">
+            <a href="{% url 'home' %}" class="btn-premium">
+              <i class="bi bi-house-door"></i>
+              Return Home
+            </a>
+            <a href="{% url 'search' %}" class="btn-premium-outline">
+              <i class="bi bi-search"></i>
+              Explore Collection
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Link to external CSS -->
+<link href="{% static 'css/cart_summary.css' %}" rel="stylesheet">
+
+<!-- Force visibility styles -->
+<style>
+/* Force cart summary visibility */
+.cart-summary {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.summary-card {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    background: #1a1a1a !important;
+    border: 1px solid #333333 !important;
+}
+
+.summary-title {
+    color: #ffffff !important;
+    display: block !important;
+}
+
+.total-label {
+    color: #ffffff !important;
+    display: block !important;
+}
+
+.total-amount {
+    color: #C6A664 !important;
+    display: block !important;
+}
+
+.feature-item {
+    color: #a0a0a0 !important;
+    display: flex !important;
+}
+
+.feature-item i {
+    color: #C6A664 !important;
+}
+
+.feature-item span {
+    color: #a0a0a0 !important;
+}
+
+.btn-premium.full-width {
+    background: linear-gradient(135deg, #C6A664, #A88C4A) !important;
+    color: #2C2C2C !important;
+    display: flex !important;
+}
+
+.btn-premium-outline.full-width {
+    background: transparent !important;
+    color: #C6A664 !important;
+    border: 1px solid #C6A664 !important;
+    display: flex !important;
+}
+
+.btn-premium-outline.full-width:hover {
+    background: #C6A664 !important;
+    color: #2C2C2C !important;
+}
+</style>
+
+<script>
+// Update Cart
+$(document).on('click', '.btn-update', function(e){
+    e.preventDefault();
+    var productid = $(this).data('index');
+    $.ajax({
+        type: 'POST',
+        url: '{% url 'cart_update' %}',
+        data: {
+            product_id: $(this).data('index'),
+            product_qty: $('#select' + productid + ' option:selected').text(),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            action: 'post'
+        },
+        success: function(json){
+            location.reload();
+        }
+    });
+})
+
+// Remove button click handler
+$(document).on('click', '.btn-remove', function(e){
+    e.preventDefault();
+    $.ajax({
+        type: 'POST',
+        url: '{% url 'cart_delete' %}',
+        data: {
+            product_id: $(this).data('index'),
+            csrfmiddlewaretoken: '{{ csrf_token }}',
+            action: 'post'
+        },
+        success: function(json){
+            location.reload();
+        }
+    });
+})
+
+// Add floating elements to cart section
+document.addEventListener('DOMContentLoaded', function() {
+    const cartSection = document.querySelector('.premium-cart-section');
+    if (cartSection) {
+        const floatingContainer = document.createElement('div');
+        floatingContainer.className = 'floating-elements';
+        floatingContainer.innerHTML = `
+            <div class="floating-element" style="width: 180px; height: 180px; top: 10%; right: -40px; animation-delay: 0s;"></div>
+            <div class="floating-element" style="width: 120px; height: 120px; bottom: 20%; left: -25px; animation-delay: 2s;"></div>
+            <div class="floating-element" style="width: 90px; height: 90px; top: 60%; right: 15%; animation-delay: 4s;"></div>
+        `;
+        cartSection.appendChild(floatingContainer);
+    }
+    
+    // Debug: Check if cart summary exists
+    console.log('Cart summary element:', document.querySelector('.cart-summary'));
+    console.log('Cart summary visibility:', document.querySelector('.cart-summary') ? 'EXISTS' : 'MISSING');
+});
+</script>
+
+{% endblock %}

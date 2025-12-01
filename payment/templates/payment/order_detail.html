@@ -1,0 +1,383 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container py-5">
+    <!-- Back Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <a href="{% url 'user_orders' %}" class="back-link">
+                <i class="bi bi-arrow-left"></i>
+                Back to Orders
+            </a>
+        </div>
+    </div>
+
+    <!-- Order Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="order-header">
+                <div class="header-left">
+                    <h1 class="order-title">Order #{{ order.id }}</h1>
+                    <p class="order-date">
+                        <i class="bi bi-calendar"></i>
+                        {{ order.date_ordered|date:"F d, Y" }}
+                    </p>
+                </div>
+                <div class="header-right">
+                    <div class="order-status-lg {% if order.shipped %}shipped{% else %}processing{% endif %}">
+                        {% if order.shipped %}
+                            <i class="bi bi-check-circle"></i>
+                            <div>
+                                <strong>Shipped</strong>
+                                {% if order.date_shipped %}
+                                    <small>{{ order.date_shipped|date:"M d, Y" }}</small>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <i class="bi bi-clock"></i>
+                            <div>
+                                <strong>Processing</strong>
+                                <small>Estimated dispatch: 3-5 days</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Content -->
+    <div class="row">
+        <!-- Order Items -->
+        <div class="col-lg-8 mb-4">
+            <div class="order-items-card">
+                <h3 class="card-title">Order Items</h3>
+                
+                {% for item in order_items %}
+                <div class="order-item">
+                    <div class="item-image">
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    </div>
+                    <div class="item-details">
+                        <h4 class="item-name">{{ item.product.name }}</h4>
+                        {% if item.selected_size or item.custom_size %}
+                        <p class="item-size">
+                            <i class="bi bi-rulers"></i>
+                            {% if item.selected_size %}
+                                Size: {{ item.selected_size }}
+                            {% endif %}
+                            {% if item.custom_size %}
+                                Custom: {{ item.custom_size }}
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                        <p class="item-price">${{ item.price }} × {{ item.quantity }}</p>
+                    </div>
+                    <div class="item-total">
+                        <strong>${{ item.price|floatformat:2 }}</strong>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Order Summary & Shipping -->
+        <div class="col-lg-4">
+            <!-- Order Summary -->
+            <div class="summary-card mb-4">
+                <h3 class="card-title">Order Summary</h3>
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>${{ subtotal|floatformat:2 }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>${{ shipping|floatformat:2 }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax</span>
+                    <span>${{ tax|floatformat:2 }}</span>
+                </div>
+                <div class="summary-row total">
+                    <strong>Total</strong>
+                    <strong>${{ total|floatformat:2 }}</strong>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="shipping-card">
+                <h3 class="card-title">Shipping Address</h3>
+                <div class="shipping-address">
+                    {{ order.shipping_address|linebreaks }}
+                </div>
+                <div class="shipping-email mt-3">
+                    <i class="bi bi-envelope"></i>
+                    {{ order.email }}
+                </div>
+            </div>
+
+            <!-- Order Actions -->
+            <div class="order-actions-card mt-4">
+                <h3 class="card-title">Order Actions</h3>
+                <div class="actions-grid">
+                    <button onclick="window.print()" class="action-btn">
+                        <i class="bi bi-printer"></i>
+                        Print Invoice
+                    </button>
+                    {% if not order.shipped %}
+                    <button class="action-btn text-danger" onclick="alert('Contact customer service to cancel this order.')">
+                        <i class="bi bi-x-circle"></i>
+                        Request Cancel
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --gold-primary: #C6A664;
+    --gold-dark: #A88C4A;
+    --gold-light: #E8D9B0;
+    --bg-dark: #0f0f0f;
+    --bg-darker: #0a0a0a;
+    --bg-card: #1a1a1a;
+    --border-dark: #333333;
+    --text-on-dark: #ffffff;
+    --text-muted-dark: #a0a0a0;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gold-primary);
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+.back-link:hover {
+    color: var(--gold-light);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.order-title {
+    font-family: 'Unica One', cursive;
+    font-size: 2.2rem;
+    color: var(--text-on-dark);
+    margin-bottom: 0.5rem;
+}
+
+.order-date {
+    color: var(--text-muted-dark);
+    font-size: 0.95rem;
+}
+
+.order-status-lg {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-size: 1rem;
+}
+
+.order-status-lg.processing {
+    background: rgba(255, 193, 7, 0.1);
+    color: #FFC107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.order-status-lg.shipped {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.order-status-lg i {
+    font-size: 1.5rem;
+}
+
+.order-status-lg small {
+    display: block;
+    font-size: 0.85rem;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.order-items-card,
+.summary-card,
+.shipping-card,
+.order-actions-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid var(--border-dark);
+    margin-bottom: 1.5rem;
+}
+
+.card-title {
+    font-family: 'Unica One', cursive;
+    font-size: 1.5rem;
+    color: var(--text-on-dark);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.order-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.item-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 600;
+    color: var(--text-on-dark);
+    margin-bottom: 0.5rem;
+}
+
+.item-size {
+    color: var(--text-muted-dark);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.item-price {
+    color: var(--gold-primary);
+    font-weight: 600;
+}
+
+.item-total {
+    font-size: 1.1rem;
+    color: var(--text-on-dark);
+    font-weight: 700;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 0;
+    color: var(--text-on-dark);
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-row.total {
+    font-size: 1.2rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-dark);
+}
+
+.shipping-address {
+    color: var(--text-on-dark);
+    line-height: 1.6;
+}
+
+.shipping-email {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted-dark);
+}
+
+.actions-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    color: var(--text-on-dark);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+}
+
+.action-btn:hover {
+    background: rgba(198, 166, 100, 0.1);
+    border-color: var(--gold-primary);
+    color: var(--gold-primary);
+    transform: translateY(-2px);
+}
+
+.action-btn.text-danger:hover {
+    background: rgba(244, 67, 54, 0.1);
+    border-color: #f44336;
+    color: #f44336;
+}
+
+@media (max-width: 768px) {
+    .order-header {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+    
+    .order-title {
+        font-size: 1.8rem;
+    }
+    
+    .order-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .item-details {
+        text-align: center;
+    }
+}
+</style>
+
+{% endblock %}

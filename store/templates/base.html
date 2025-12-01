@@ -1,0 +1,525 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Leciselé - Handcrafted Hats</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Unica+One&display=swap" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <style>
+            :root {
+                --gold-primary: #C6A664;
+                --gold-dark: #A88C4A;
+                --gold-light: #E8D9B0;
+                --beige-primary: #D6C6B1;
+                --beige-light: #F5F3F0;
+                --beige-lighter: #FAF9F7;
+                --text-dark: #2C2C2C;
+                --text-light: #6C6C6C;
+                --border-light: #EAE5DD;
+                --white: #FFFFFF;
+                --shadow: 0 4px 20px rgba(214, 198, 177, 0.15);
+                --shadow-hover: 0 8px 30px rgba(198, 166, 100, 0.2);
+                
+                /* Dark Background Variables */
+                --bg-dark: #0f0f0f;
+                --bg-darker: #0a0a0a;
+                --bg-card: #1a1a1a;
+                --bg-card-hover: #222222;
+                --border-dark: #333333;
+                --text-on-dark: #ffffff;
+                --text-muted-dark: #a0a0a0;
+            }
+
+            /* Global Styles */
+            body {
+                background-color: var(--bg-dark);
+                color: var(--text-on-dark);
+                font-family: 'Montserrat', sans-serif;
+                min-height: 100vh;
+                overflow-x: hidden;
+            }
+
+            /* Premium Typography */
+            h1, h2, h3, h4, h5, h6 {
+                font-family: 'Unica One', cursive;
+                color: var(--text-on-dark);
+            }
+
+            .section-title {
+                font-family: 'Unica One', cursive;
+                font-size: 2.5rem;
+                color: var(--text-on-dark);
+                margin-bottom: 1rem;
+                position: relative;
+            }
+
+            .section-title::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 60px;
+                height: 2px;
+                background: linear-gradient(90deg, var(--gold-primary), transparent);
+            }
+
+            .section-subtitle {
+                color: var(--text-muted-dark);
+                font-size: 1.1rem;
+                margin-bottom: 2rem;
+            }
+
+            /* Premium Section Decoration */
+            .section-decoration {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 1rem;
+                margin: 2rem 0;
+            }
+
+            .decoration-line {
+                width: 40px;
+                height: 1px;
+                background: linear-gradient(90deg, var(--gold-primary), transparent);
+            }
+
+            .decoration-line:last-child {
+                background: linear-gradient(90deg, transparent, var(--gold-primary));
+            }
+
+            .decoration-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+                background: var(--gold-primary);
+                animation: dotPulse 2s ease-in-out infinite;
+            }
+
+            @keyframes dotPulse {
+                0%, 100% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.3); opacity: 0.7; }
+            }
+
+            /* Premium Background Elements */
+            .premium-background {
+                position: relative;
+                background: linear-gradient(135deg, 
+                    rgba(15, 15, 15, 0.95) 0%,
+                    rgba(10, 10, 10, 0.98) 50%,
+                    rgba(30, 30, 30, 0.95) 100%);
+                overflow: hidden;
+            }
+
+            .floating-elements {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                pointer-events: none;
+            }
+
+            .floating-element {
+                position: absolute;
+                border-radius: 50%;
+                background: linear-gradient(135deg, var(--gold-primary), transparent);
+                opacity: 0.08;
+                animation: floatElement 8s ease-in-out infinite;
+            }
+
+            @keyframes floatElement {
+                0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+                33% { transform: translateY(-30px) rotate(120deg) scale(1.05); }
+                66% { transform: translateY(15px) rotate(240deg) scale(0.95); }
+            }
+
+            /* Premium Cards */
+            .premium-card {
+                background: var(--bg-card);
+                border-radius: 16px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                transition: all 0.3s ease;
+                border: 1px solid var(--border-dark);
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            .premium-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 30px rgba(198, 166, 100, 0.2);
+                background: var(--bg-card-hover);
+            }
+
+            /* Premium Buttons */
+            .btn-premium {
+                background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+                color: var(--text-dark);
+                border: none;
+                border-radius: 8px;
+                padding: 0.75rem 1.5rem;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .btn-premium:hover {
+                background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
+                color: var(--text-dark);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 25px rgba(198, 166, 100, 0.3);
+            }
+
+            .btn-premium-outline {
+                background: transparent;
+                color: var(--gold-primary);
+                border: 1px solid var(--gold-primary);
+                border-radius: 8px;
+                padding: 0.75rem 1.5rem;
+                font-weight: 600;
+                transition: all 0.3s ease;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .btn-premium-outline:hover {
+                background: var(--gold-primary);
+                color: var(--text-dark);
+                transform: translateY(-2px);
+            }
+
+            /* Footer */
+            .home-footer {
+                background: var(--bg-darker);
+                border-top: 1px solid var(--border-dark);
+                margin-top: auto;
+            }
+
+            .footer-text {
+                font-family: 'Unica One', cursive;
+                letter-spacing: 0.15em;
+                color: var(--text-on-dark);
+                text-transform: uppercase;
+                font-size: 1.05rem;
+                font-weight: 600;
+            }
+
+            /* Social Icons */
+            .social-icon {
+                font-size: 1.6rem;
+                margin: 0 12px;
+                color: var(--text-on-dark);
+                transition: all 0.25s ease;
+                display: inline-block;
+            }
+
+            .social-icon:hover {
+                color: var(--gold-light);
+                transform: scale(1.15) rotate(-3deg);
+                text-shadow: 0 4px 16px rgba(232, 217, 176, 0.5);
+            }
+
+            /* Footer Links */
+            .footer-links {
+                display: flex;
+                justify-content: center;
+                flex-wrap: wrap;
+                gap: 2rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .footer-link {
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 500;
+                color: var(--text-on-dark);
+                text-decoration: none;
+                transition: all 0.3s ease;
+                position: relative;
+                padding: 0.5rem 0;
+                font-size: 0.95rem;
+                letter-spacing: 0.05em;
+            }
+
+            .footer-link:hover {
+                color: var(--gold-light);
+            }
+
+            .footer-link::after {
+                content: '';
+                position: absolute;
+                width: 0;
+                height: 2px;
+                bottom: 0;
+                left: 0;
+                background-color: var(--gold-light);
+                transition: width 0.3s ease;
+            }
+
+            .footer-link:hover::after {
+                width: 100%;
+            }
+
+            /* Alert Styling for Dark Theme */
+            .alert-warning {
+                background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+                color: var(--bg-dark);
+                border: 1px solid var(--gold-light);
+                border-radius: 12px;
+                box-shadow: 0 4px 20px rgba(198, 166, 100, 0.3);
+                border: none;
+            }
+
+            .btn-close {
+                filter: invert(1);
+            }
+
+            /* Utility Classes */
+            .text-gold {
+                color: var(--gold-primary) !important;
+            }
+
+            .text-muted-dark {
+                color: var(--text-muted-dark) !important;
+            }
+
+            .bg-dark-custom {
+                background-color: var(--bg-dark) !important;
+            }
+
+            .bg-card-custom {
+                background-color: var(--bg-card) !important;
+            }
+
+            .border-dark-custom {
+                border-color: var(--border-dark) !important;
+            }
+
+            /* Animation Classes */
+            .fade-in-up {
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.6s ease;
+            }
+
+            .fade-in-up.visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            /* Responsive Design */
+            @media (max-width: 768px) {
+                .footer-links {
+                    gap: 1.5rem;
+                }
+                
+                .footer-link {
+                    font-size: 0.9rem;
+                }
+
+                .section-title {
+                    font-size: 2rem;
+                }
+
+                .section-title::after {
+                    left: 50%;
+                    transform: translateX(-50%);
+                }
+            }
+
+            @media (max-width: 576px) {
+                .footer-links {
+                    gap: 1rem;
+                    flex-direction: column;
+                    align-items: center;
+                }
+            }
+
+            /* Smooth scrolling */
+            html {
+                scroll-behavior: smooth;
+            }
+
+            /* Main content wrapper */
+            .main-content {
+                min-height: calc(100vh - 200px);
+            }
+        </style>
+    </head>
+    <body class="bg-dark-custom">
+        {% include 'navbar.html' %}
+        
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-warning alert-dismissible fade show mb-0" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}
+            <!-- Page specific content goes here -->
+            {% endblock %}
+        </main>
+
+        <!-- Footer-->
+        <footer class="home-footer py-5">
+            <div class="container text-center">
+                <!-- Social Media Icons -->
+                <div class="mb-4">
+                    <a href="https://www.instagram.com" target="_blank" class="social-icon">
+                        <i class="bi bi-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com" target="_blank" class="social-icon">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+                </div>
+                
+                <!-- Policy Links -->
+                <div class="footer-links">
+                    <a href="{% url 'shipping_policy' %}" class="footer-link">Shipping Policy</a>
+                    <a href="{% url 'returns' %}" class="footer-link">Returns & Refunds</a>
+                    <a href="{% url 'term' %}" class="footer-link">Terms of Service</a>
+                    <a href="{% url 'privacy' %}" class="footer-link">Privacy Policy</a>
+                    <a href="{% url 'about' %}" class="footer-link">Contact Us</a>
+                </div>
+                
+                <!-- Copyright Text -->
+                <p class="m-0 footer-text">
+                    © 2025 Leciselé — All Rights Reserved
+                </p>
+            </div>
+        </footer>
+
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="{% static 'js/scripts.js' %}"></script>
+
+        <!-- Global JavaScript -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Animation observer
+                const observerOptions = {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                };
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, observerOptions);
+
+                // Observe elements with fade-in-up class
+                document.querySelectorAll('.fade-in-up').forEach(el => {
+                    observer.observe(el);
+                });
+
+                // Notification function (global)
+                window.showNotification = function(message, type = 'success') {
+                    const notification = document.createElement('div');
+                    notification.className = `notification ${type}`;
+                    notification.innerHTML = `
+                        <i class="bi bi-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                        <span>${message}</span>
+                    `;
+                    
+                    // Add notification styles if not already added
+                    if (!document.querySelector('#notification-styles')) {
+                        const styles = document.createElement('style');
+                        styles.id = 'notification-styles';
+                        styles.textContent = `
+                            .notification {
+                                position: fixed;
+                                top: 2rem;
+                                right: 2rem;
+                                background: var(--bg-card);
+                                padding: 1rem 1.5rem;
+                                border-radius: 12px;
+                                box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+                                display: flex;
+                                align-items: center;
+                                gap: 0.75rem;
+                                transform: translateX(400px);
+                                transition: transform 0.3s ease;
+                                z-index: 1001;
+                                border-left: 4px solid #4CAF50;
+                                color: var(--text-on-dark);
+                            }
+                            .notification.error {
+                                border-left-color: #f44336;
+                            }
+                            .notification.show {
+                                transform: translateX(0);
+                            }
+                            .notification i {
+                                font-size: 1.2rem;
+                            }
+                            .notification.success i {
+                                color: #4CAF50;
+                            }
+                            .notification.error i {
+                                color: #f44336;
+                            }
+                        `;
+                        document.head.appendChild(styles);
+                    }
+                    
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.classList.add('show');
+                    }, 100);
+                    
+                    setTimeout(() => {
+                        notification.classList.remove('show');
+                        setTimeout(() => {
+                            if (document.body.contains(notification)) {
+                                document.body.removeChild(notification);
+                            }
+                        }, 300);
+                    }, 3000);
+                };
+            });
+            // Add floating elements to login section
+document.addEventListener('DOMContentLoaded', function() {
+    const loginSection = document.querySelector('.premium-login-section');
+    if (loginSection) {
+        const floatingContainer = document.createElement('div');
+        floatingContainer.className = 'floating-elements';
+        floatingContainer.innerHTML = `
+            <div class="floating-element el-1"></div>
+            <div class="floating-element el-2"></div>
+            <div class="floating-element el-3"></div>
+        `;
+        loginSection.appendChild(floatingContainer);
+    }
+});
+        </script>
+    </body>
+</html>

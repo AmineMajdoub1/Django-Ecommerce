@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Add CSS -->
+<link rel="stylesheet" href="{% static 'css/about.css' %}">
+
+<!-- ==================== PREMIUM HERO HEADER ==================== -->
+<header class="premium-hero-section">
+  <div class="hero-background">
+    <div class="background-elements">
+      <div class="floating-element el-1"></div>
+      <div class="floating-element el-2"></div>
+      <div class="floating-element el-3"></div>
+      <div class="floating-element el-4"></div>
+    </div>
+    <div class="gradient-overlay"></div>
+  </div>
+  
+  <div class="container">
+    <div class="hero-content">
+      <div class="brand-presentation">
+        <div class="logo-glow"></div>
+        <h1 class="brand-title">
+          <span class="title-main">Our Story</span>
+          <span class="title-subtitle">LECISELÉ HERITAGE</span>
+        </h1>
+        <div class="hero-divider">
+          <div class="divider-line"></div>
+          <div class="divider-dot"></div>
+          <div class="divider-line"></div>
+        </div>
+        <p class="hero-tagline">Where French craftsmanship meets timeless elegance</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12 col-lg-10 mx-auto">
+            <br/><br/>
+            <p class="about-copy" align="justify">
+                Atelier Leciselé creates timeless, bespoke hats using traditional techniques and carefully
+                selected materials. Whether you're looking for a custom piece, help with sizing, or to
+                schedule a private fitting, we'll guide you every step of the way. Tell us about your idea —
+                materials, style, and occasion — and we'll make something unique.
+            </p>
+            <br/><br/>
+        </div>
+    </div>
+
+    <!-- Contact form section (Get in touch) -->
+    <section class="py-5">
+        <div class="container px-4 px-lg-5">
+            <div class="text-center mb-4">
+                <h2 class="contact-title">GET IN TOUCH</h2>
+                <p class="contact-sub">Questions about a custom hat? Need help with sizing? Want to book a fitting or discuss a project?</p>
+            </div>
+
+            {% if messages %}
+            <div class="row justify-content-center mb-3">
+                <div class="col-12 col-lg-8">
+                    {% for message in messages %}
+                        <div class="alert alert-success contact-alert">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- centered, limited-width form (posts to same URL) -->
+            <form method="post" action="" class="contact-form">
+                {% csrf_token %}
+                <div class="row justify-content-center gx-3">
+                    <div class="col-12 col-lg-8">
+                        <div class="row gx-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ contact_form.name.id_for_label }}" class="contact-label">Name</label>
+                                {{ contact_form.name }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ contact_form.email.id_for_label }}" class="contact-label">E‑mail</label>
+                                {{ contact_form.email }}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ contact_form.message.id_for_label }}" class="contact-label">Message</label>
+                            {{ contact_form.message }}
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" name="contact_submit" class="btn-premium contact-submit">SEND MESSAGE</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <br/><br/>
+        </div>
+    </section>
+</div>
+
+{% endblock %}

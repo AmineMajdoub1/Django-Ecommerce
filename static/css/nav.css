@@ -1,0 +1,390 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Unica+One&display=swap');
+
+:root {
+  --gold-primary: #C6A664;
+  --gold-dark: #A88C4A;
+  --gold-light: #E8D9B0;
+  --beige-primary: #D6C6B1;
+  --beige-light: #F5F3F0;
+  --text-dark: #2C2C2C;
+  --text-light: #6C6C6C;
+  --white: #FFFFFF;
+  
+  /* Dark Theme Variables */
+  --bg-dark: #0f0f0f;
+  --bg-darker: #0a0a0a;
+  --bg-card: #1a1a1a;
+  --bg-card-hover: #222222;
+  --border-dark: #333333;
+  --text-on-dark: #ffffff;
+  --text-muted-dark: #a0a0a0;
+}
+
+/* Fix for dropdown z-index issue */
+.main-navbar {
+  z-index: 1030; /* Ensure navbar is above other content */
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-darker) 100%);
+  border-bottom: 1px solid var(--border-dark);
+  font-family: 'Montserrat', Arial, sans-serif;
+  min-height: 80px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  position: relative;
+}
+
+.profile-dropdown {
+  position: relative;
+  z-index: 1031; /* Higher than navbar */
+}
+
+.profile-dropdown .dropdown-menu {
+  z-index: 1040 !important; /* Higher than everything else */
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: auto;
+  margin-top: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+}
+
+/* Ensure dropdown appears above page headers */
+.premium-hero-section,
+.home-header,
+.bg-white.border-bottom {
+  position: relative;
+  z-index: 1; /* Lower than navbar dropdowns */
+}
+
+/* Premium Brand Styling */
+.navbar-brand {
+  color: var(--gold-primary) !important;
+  font-family: 'Unica One', 'Montserrat', Arial, sans-serif;
+  letter-spacing: 0.15em;
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  position: relative;
+}
+
+.logo-container {
+  position: relative;
+  margin-right: 15px;
+}
+
+.navbar-logo {
+  height: 50px;
+  width: auto;
+  border-radius: 12px;
+  border: 2px solid var(--gold-primary);
+  background: var(--bg-card);
+  box-shadow: 0 4px 15px rgba(198, 166, 100, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+.logo-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, var(--gold-light) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 15px;
+}
+
+.navbar-brand:hover .logo-glow {
+  opacity: 0.6;
+}
+
+.navbar-brand:hover .navbar-logo {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(198, 166, 100, 0.4);
+}
+
+.brand-text {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Enhanced Navigation Links */
+.nav-link {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 1rem;
+  border-radius: 25px;
+  padding: 0.6rem 1.4rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin: 0 0.2rem;
+  position: relative;
+  overflow: hidden;
+  color: var(--text-on-dark) !important;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.nav-link:hover::before {
+  left: 100%;
+}
+
+.nav-icon-wrapper {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  color: var(--text-on-dark);
+}
+
+.nav-link:hover .nav-icon-wrapper {
+  transform: translateY(-2px);
+}
+
+.nav-link-text {
+  color: var(--text-on-dark) !important;
+  font-weight: 600;
+  font-size: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Active State Enhancement */
+.navbar-nav .nav-link.active {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  box-shadow: 0 4px 15px rgba(198, 166, 100, 0.3);
+}
+
+.navbar-nav .nav-link.active .nav-link-text {
+  color: var(--white) !important;
+}
+
+.navbar-nav .nav-link.active .nav-icon-wrapper {
+  color: var(--white) !important;
+}
+
+/* Premium Action Icons */
+.navbar-actions {
+  gap: 1rem !important;
+}
+
+.action-icon, .navbar-profile {
+  position: relative;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.icon-container, .profile-avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 1px solid var(--border-dark);
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.action-icon:hover .icon-container,
+.navbar-profile:hover .profile-avatar {
+  background: var(--gold-primary);
+  border-color: var(--gold-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(198, 166, 100, 0.4);
+}
+
+.action-icon:hover i,
+.navbar-profile:hover i {
+  color: var(--bg-dark) !important;
+}
+
+.action-icon i, .navbar-profile i {
+  font-size: 1.3rem;
+  color: var(--text-on-dark);
+  transition: all 0.3s ease;
+}
+
+/* Enhanced Badges */
+.icon-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  color: var(--bg-dark);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2em 0.5em;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  border: 2px solid var(--bg-card);
+}
+
+.icon-badge.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Online Indicator */
+.online-indicator {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  background: #4CAF50;
+  border: 2px solid var(--bg-card);
+  border-radius: 50%;
+}
+
+/* Premium Dropdown */
+.profile-dropdown .dropdown-menu {
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
+  padding: 0.5rem;
+  min-width: 200px;
+  background: var(--bg-card);
+}
+
+.dropdown-item {
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  margin: 0.1rem 0;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  color: var(--text-on-dark);
+}
+
+.dropdown-item:hover {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  color: var(--bg-dark) !important;
+  transform: translateX(5px);
+}
+
+.dropdown-divider {
+  border-color: var(--border-dark);
+}
+
+/* Luxury Toggler */
+.elegant-toggler {
+  border: none;
+  background: transparent;
+  padding: 0.5rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-dark);
+}
+
+.elegant-toggler:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--gold-primary);
+}
+
+.toggler-lines {
+  width: 20px;
+  height: 2px;
+  background: var(--text-on-dark);
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.toggler-lines::before,
+.toggler-lines::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 2px;
+  background: var(--text-on-dark);
+  left: 0;
+  transition: all 0.3s ease;
+}
+
+.toggler-lines::before {
+  top: -6px;
+}
+
+.toggler-lines::after {
+  top: 6px;
+}
+
+.elegant-toggler:hover .toggler-lines,
+.elegant-toggler:hover .toggler-lines::before,
+.elegant-toggler:hover .toggler-lines::after {
+  background: var(--gold-primary);
+}
+
+.elegant-toggler[aria-expanded="true"] .toggler-lines {
+  background: transparent;
+}
+
+.elegant-toggler[aria-expanded="true"] .toggler-lines::before {
+  transform: rotate(45deg);
+  top: 0;
+}
+
+.elegant-toggler[aria-expanded="true"] .toggler-lines::after {
+  transform: rotate(-45deg);
+  top: 0;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 991px) {
+  .navbar-nav {
+    text-align: center;
+    padding: 1rem 0;
+    gap: 0.5rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    margin-top: 1rem;
+    border: 1px solid var(--border-dark);
+  }
+  
+  .navbar-actions {
+    justify-content: center;
+    margin-top: 1rem;
+    gap: 1.5rem !important;
+  }
+  
+  .nav-link {
+    margin: 0.2rem 0;
+    justify-content: center;
+  }
+  
+  .profile-dropdown .dropdown-menu {
+    position: static;
+    margin-top: 0.5rem;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+.navbar * {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  /* Leciselé premium theme for error/failed pages */
+  .failed-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    text-align: center;
+  }
+  .failed-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    max-width: 500px;
+    width: 100%;
+  }
+  .failed-icon {
+    font-size: 4rem;
+    color: #dc3545;
+    margin-bottom: 1rem;
+  }
+  .failed-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: #C8A951; /* gold to keep Leciselé luxury */
+    margin-bottom: 1rem;
+  }
+  .failed-text {
+    font-size: 1.05rem;
+    color: #555;
+    margin-bottom: 2rem;
+  }
+  .btn-lecisele {
+    background-color: transparent;
+    border: 1px solid #C8A951;
+    color: #C8A951;
+    border-radius: 50px;
+    font-weight: 500;
+    padding: 0.6rem 1.8rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  .btn-lecisele:hover {
+    background-color: #C8A951;
+    color: #1C1C1C;
+  }
+</style>
+
+<div class="container failed-wrapper">
+  <div class="failed-card">
+    <div class="failed-icon">❌</div>
+    <h1 class="failed-title">Payment Failed</h1>
+    <p class="failed-text">
+      Unfortunately, your payment could not be processed.<br/>
+      Please try again or use another payment method.
+    </p>
+    <a href="{% url 'checkout' %}" class="btn-lecisele">Try Again</a>
+    <br/><br/>
+    <a href="{% url 'home' %}" class="btn btn-sm btn-outline-secondary rounded-pill">Back to Home</a>
+  </div>
+</div>
+
+{% endblock %}

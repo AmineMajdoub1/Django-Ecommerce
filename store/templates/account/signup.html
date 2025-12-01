@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load socialaccount %}
+{% block content %}
+
+<div class="container d-flex align-items-center justify-content-center min-vh-100">
+    <div class="col-md-7 col-lg-5">
+        <div class="login-card shadow-lg p-4 rounded-4">
+            <div class="text-center mb-4">
+                <h1 class="display-5 fw-bold login-title mb-2">Sign Up</h1>
+                <p class="lead login-subtitle mb-0">Create your account to start shopping!</p>
+            </div>
+            <form method="post" action="">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-grid mt-3">
+                    <button type="submit" class="btn login-btn-gold py-2">Sign Up</button>
+                </div>
+            </form>
+            <div class="text-center my-3">
+                <span class="login-or">or</span>
+            </div>
+            <div class="d-grid mb-3">
+                <a href="{% provider_login_url 'google' %}" class="btn login-btn-google py-2">
+                    <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" style="width:22px; margin-right:8px; vertical-align:middle;">
+                    Sign up with Google
+                </a>
+            </div>
+            <div class="text-center mt-3">
+                <a href="{% url 'login' %}" class="login-link">Already have an account? Login</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+body {
+    background: linear-gradient(120deg, #e9e6e2 60%, #b8a98d 100%);
+    font-family: 'Montserrat', Arial, sans-serif;
+    background-image: url('https://www.transparenttextures.com/patterns/diamond-upholstery.png');
+    background-size: 300px 300px;
+}
+.login-card {
+    background: #f8f6f3;
+    border-radius: 1.5rem;
+    border: 1.5px solid #C6A664;
+    box-shadow: 0 2px 12px #C6A66422;
+}
+.login-title {
+    font-family: 'Unica One', 'Montserrat', Arial, sans-serif;
+    letter-spacing: 0.18em;
+    color: #A88A3C;
+    text-transform: uppercase;
+    text-shadow: 0 2px 16px #C6A66433;
+    font-size: 2rem;
+}
+.login-subtitle {
+    color: #A88A3C;
+    font-family: 'Montserrat', Arial, sans-serif;
+    letter-spacing: 0.12em;
+    font-size: 1.1rem;
+    text-shadow: 0 1px 8px #C6A66433;
+    margin-top: 0.5rem;
+}
+.login-btn-gold {
+    background: linear-gradient(90deg, #A88A3C 0%, #C6A664 100%);
+    color: #fff;
+    border: none;
+    border-radius: 2rem;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 12px #C6A66422;
+    transition: background 0.2s, color 0.2s;
+}
+.login-btn-gold:hover, .login-btn-gold:focus {
+    background: linear-gradient(90deg, #C6A664 0%, #A88A3C 100%);
+    color: #fff;
+}
+.login-btn-google {
+    background: #fff;
+    color: #222;
+    border: 2px solid #C6A664;
+    border-radius: 2rem;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    font-size: 1.08rem;
+    box-shadow: 0 1px 6px #C6A66433;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.login-btn-google:hover, .login-btn-google:focus {
+    background: #F5F3F0;
+    color: #A88A3C;
+    border-color: #A88A3C;
+}
+.login-or {
+    color: #A88A3C;
+    font-weight: 700;
+    font-family: 'Montserrat', Arial, sans-serif;
+    letter-spacing: 0.08em;
+}
+.login-link {
+    color: #A88A3C;
+    font-family: 'Montserrat', Arial, sans-serif;
+    font-size: 1rem;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+.login-link:hover, .login-link:focus {
+    color: #C6A664;
+    text-decoration: none;
+}
+</style>
+
+{% endblock %}

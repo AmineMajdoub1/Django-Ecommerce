@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/orders.css' %}">
+
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="page-title mb-3">My Orders</h1>
+            <div class="page-divider">
+                <div class="divider-line"></div>
+                <div class="divider-dot"></div>
+                <div class="divider-line"></div>
+            </div>
+            
+            <!-- Order Statistics -->
+            <div class="order-stats row mt-4">
+                <div class="col-md-4 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="bi bi-bag-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>{{ total_orders }}</h3>
+                            <p>Total Orders</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon shipped">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>{{ shipped_orders }}</h3>
+                            <p>Shipped</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-icon pending">
+                            <i class="bi bi-clock-history"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>{{ pending_orders }}</h3>
+                            <p>Pending</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="orders-table-container">
+                {% if orders %}
+                    <div class="table-responsive">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Order #</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr class="order-row">
+                                    <td class="order-number">
+                                        <strong>#{{ order.id }}</strong>
+                                    </td>
+                                    <td class="order-date">
+                                        {{ order.date_ordered|date:"M d, Y" }}
+                                    </td>
+                                    <td class="order-items">
+                                        {% with order.orderitem_set.all as items %}
+                                            {{ items.count }} item{{ items.count|pluralize }}
+                                        {% endwith %}
+                                    </td>
+                                    <td class="order-total">
+                                        ${{ order.amount_paid }}
+                                    </td>
+                                    <td class="order-status">
+                                        <span class="status-badge {% if order.shipped %}shipped{% else %}processing{% endif %}">
+                                            {% if order.shipped %}
+                                                <i class="bi bi-check-circle"></i> Shipped
+                                                {% if order.date_shipped %}
+                                                    <small class="d-block">{{ order.date_shipped|date:"M d" }}</small>
+                                                {% endif %}
+                                            {% else %}
+                                                <i class="bi bi-clock"></i> Processing
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td class="order-actions">
+                                        <a href="{% url 'order_detail' order.id %}" class="btn-view-order">
+                                            View Details
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <div class="pagination-container mt-4">
+                        <nav class="pagination">
+                            {% if page_obj.has_previous %}
+                            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn prev">
+                                <i class="bi bi-chevron-left"></i>
+                                Previous
+                            </a>
+                            {% endif %}
+
+                            <div class="pagination-pages">
+                                {% for num in page_obj.paginator.page_range %}
+                                    {% if page_obj.number == num %}
+                                    <span class="pagination-page active">{{ num }}</span>
+                                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <a href="?page={{ num }}" class="pagination-page">{{ num }}</a>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn next">
+                                Next
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                    {% endif %}
+
+                {% else %}
+                    <!-- Empty State -->
+                    <div class="empty-orders text-center py-5">
+                        <div class="empty-icon mb-4">
+                            <i class="bi bi-bag"></i>
+                        </div>
+                        <h3 class="mb-3">No Orders Yet</h3>
+                        <p class="text-muted mb-4">Start shopping to see your orders here</p>
+                        <a href="{% url 'search' %}" class="btn-premium">
+                            <i class="bi bi-shop"></i>
+                            Start Shopping
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+:root {
+    --gold-primary: #C6A664;
+    --gold-dark: #A88C4A;
+    --gold-light: #E8D9B0;
+    --bg-dark: #0f0f0f;
+    --bg-darker: #0a0a0a;
+    --bg-card: #1a1a1a;
+    --bg-card-hover: #222222;
+    --border-dark: #333333;
+    --text-on-dark: #ffffff;
+    --text-muted-dark: #a0a0a0;
+}
+
+.page-title {
+    font-family: 'Unica One', cursive;
+    font-size: 2.5rem;
+    color: var(--text-on-dark);
+    text-align: center;
+}
+
+.page-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 2rem auto;
+    max-width: 300px;
+}
+
+.divider-line {
+    width: 40px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--gold-primary), transparent);
+}
+
+.divider-line:last-child {
+    background: linear-gradient(90deg, transparent, var(--gold-primary));
+}
+
+.divider-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--gold-primary);
+}
+
+.order-stats {
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    border: 1px solid var(--border-dark);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--gold-primary);
+    box-shadow: 0 8px 30px rgba(198, 166, 100, 0.2);
+}
+
+.stat-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: rgba(198, 166, 100, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: var(--gold-primary);
+}
+
+.stat-icon.shipped {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+}
+
+.stat-icon.pending {
+    background: rgba(255, 193, 7, 0.1);
+    color: #FFC107;
+}
+
+.stat-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-on-dark);
+    margin: 0;
+    line-height: 1;
+}
+
+.stat-content p {
+    color: var(--text-muted-dark);
+    margin: 0.5rem 0 0 0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.orders-table-container {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid var(--border-dark);
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.orders-table thead {
+    background: rgba(10, 10, 10, 0.8);
+}
+
+.orders-table th {
+    padding: 1rem;
+    text-align: left;
+    color: var(--text-muted-dark);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.orders-table td {
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid var(--border-dark);
+    vertical-align: middle;
+}
+
+.order-row:hover {
+    background: rgba(198, 166, 100, 0.05);
+}
+
+.order-number {
+    font-family: 'Unica One', cursive;
+    font-size: 1.1rem;
+}
+
+.order-date {
+    color: var(--text-muted-dark);
+}
+
+.order-total {
+    font-weight: 700;
+    color: var(--text-on-dark);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.processing {
+    background: rgba(255, 193, 7, 0.1);
+    color: #FFC107;
+    border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.status-badge.shipped {
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.status-badge small {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    display: block;
+    margin-top: 2px;
+}
+
+.btn-view-order {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: rgba(198, 166, 100, 0.1);
+    color: var(--gold-primary);
+    border: 1px solid rgba(198, 166, 100, 0.3);
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.btn-view-order:hover {
+    background: var(--gold-primary);
+    color: var(--text-dark);
+    border-color: var(--gold-primary);
+    transform: translateX(3px);
+}
+
+.empty-orders {
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    color: var(--border-dark);
+    margin-bottom: 1.5rem;
+}
+
+.empty-orders h3 {
+    color: var(--text-on-dark);
+    margin-bottom: 0.5rem;
+}
+
+.btn-premium {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    color: var(--text-dark);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-premium:hover {
+    background: linear-gradient(135deg, var(--gold-light), var(--gold-primary));
+    color: var(--text-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(198, 166, 100, 0.3);
+}
+
+@media (max-width: 768px) {
+    .orders-table-container {
+        padding: 1rem;
+        overflow-x: auto;
+    }
+    
+    .orders-table {
+        min-width: 700px;
+    }
+    
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .stat-content h3 {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+{% endblock %}

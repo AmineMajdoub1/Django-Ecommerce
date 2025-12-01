@@ -1,0 +1,78 @@
+:root {
+  --black-deep: #0A0A0A;
+  --gold-matte: #C6A664;
+  --beige-natural: #D6C6B1;
+  --white-soft: #F5F3F0;
+}
+
+/* Base */
+body {
+  background-color: var(--white-soft);
+  color: var(--black-deep);
+  font-family: 'Poppins', sans-serif;
+  padding-top: 70px; /* offset for fixed navbar */
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--black-deep) !important;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  z-index: 1030;
+}
+
+.navbar-brand {
+  color: var(--gold-matte) !important;
+  letter-spacing: 2px;
+  font-size: 1.2rem;
+}
+
+.navbar a {
+  color: var(--white-soft) !important;
+  transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+  color: var(--gold-matte) !important;
+}
+
+.nav-link {
+  margin: 0 8px;
+  font-weight: 500;
+}
+
+/* Buttons */
+.btn,
+button,
+input[type="submit"] {
+  background-color: var(--gold-matte) !important;
+  color: var(--black-deep) !important;
+  border-radius: 8px !important;
+  border: none !important;
+  transition: 0.3s;
+}
+
+.btn:hover,
+button:hover,
+input[type="submit"]:hover {
+  background-color: var(--black-deep) !important;
+  color: var(--gold-matte) !important;
+  border: 1px solid var(--gold-matte) !important;
+}
+
+/* Cart Badge */
+.bg-gold {
+  background-color: var(--gold-matte) !important;
+  color: var(--black-deep);
+}
+
+/* Product Cards */
+.product-card {
+  background: var(--white-soft) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 8px rgba(10, 10, 10, 0.1) !important;
+}
+
+.product-card .price {
+  color: var(--gold-matte) !important;
+  font-weight: bold !important;
+}

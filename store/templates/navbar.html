@@ -1,0 +1,113 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/nav.css' %}">
+
+<nav class="navbar navbar-expand-lg main-navbar">
+  <div class="container px-4 px-lg-5">
+    <!-- Logo / Brand -->
+    <a class="navbar-brand d-flex align-items-center fw-bold" href="{% url 'home' %}">
+      <div class="logo-container position-relative">
+        <img src="/media/uploads/product/lo.png" alt="Leciselé Logo" class="navbar-logo">
+        <div class="logo-glow"></div>
+      </div>
+    </a>
+
+    <!-- Toggler (Mobile) - Improved -->
+    <button class="navbar-toggler elegant-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" 
+            aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="toggler-lines"></span>
+    </button>
+
+    <!-- Navbar Content -->
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <!-- Center Links -->
+      <ul class="navbar-nav mx-auto gap-1">
+        <li class="nav-item">
+          <a class="nav-link nav-link-gold {% if request.path == '/' %}active{% endif %}" href="{% url 'home' %}">
+            <div class="nav-icon-wrapper">
+              <i class="bi bi-house-door"></i>
+            </div>
+            <span class="nav-link-text">Shop</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-beige {% if request.path == '/search/' %}active{% endif %}" href="{% url 'search' %}">
+            <div class="nav-icon-wrapper">
+              <i class="bi bi-search"></i>
+            </div>
+            <span class="nav-link-text">Search</span>
+          </a>
+        </li>
+         <li class="nav-item">
+          <a class="nav-link nav-link-beige {% if request.path == '/category/gift-card/' %}active{% endif %}" href="{% url 'category' 'gift-card' %}">
+            <div class="nav-icon-wrapper">
+              <i class="bi bi-gift"></i>
+            </div>
+            <span class="nav-link-text">Gift Card</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-link-beige {% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">
+            <div class="nav-icon-wrapper">
+              <i class="bi bi-info-circle"></i>
+            </div>
+            <span class="nav-link-text">About</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Right Section -->
+      <div class="navbar-actions d-flex align-items-center gap-2 mt-3 mt-lg-0">
+        <!-- Profile -->
+        {% if user.is_authenticated %}
+          <div class="dropdown profile-dropdown">
+            <a class="navbar-profile" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <div class="profile-avatar">
+                <i class="bi bi-person-circle"></i>
+                <div class="online-indicator"></div>
+              </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="profileDropdown">
+    <li><a class="dropdown-item" href="{% url 'update_user' %}"><i class="bi bi-person"></i> Profile</a></li>
+    
+    <!-- ADD THIS LINE -->
+    <li><a class="dropdown-item" href="{% url 'user_orders' %}"><i class="bi bi-bag-check"></i> My Orders</a></li>
+    
+    {% if not request.user.is_staff %}
+        <li><a class="dropdown-item" href="{% url 'update_info' %}"><i class="bi bi-info-circle"></i> User Info</a></li>
+    {% endif %}
+    {% if request.user.is_staff %}
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{% url 'shipped_dash' %}"><i class="bi bi-truck"></i> Shipped Orders</a></li>
+        <li><a class="dropdown-item" href="{% url 'not_shipped_dash' %}"><i class="bi bi-box-seam"></i> Not Shipped</a></li>
+    {% endif %}
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item text-danger" href="{% url 'logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+</ul>
+          </div>
+        {% else %}
+          <a href="{% url 'login' %}" class="navbar-profile">
+            <div class="profile-avatar">
+              <i class="bi bi-person"></i>
+            </div>
+          </a>
+        {% endif %}
+
+        <!-- Wishlist -->
+        <a href="{% url 'wishlist' %}" class="action-icon wishlist-icon">
+          <div class="icon-container">
+            <i class="bi bi-heart"></i>
+            <span class="icon-badge pulse">{{ wishlist_count }}</span>
+          </div>
+        </a>
+
+        <!-- Cart -->
+        <a href="{% url 'cart_summary' %}" class="action-icon cart-icon">
+          <div class="icon-container">
+            <i class="bi bi-cart"></i>
+            <span class="icon-badge pulse" id="cart_quantity">{{ cart|length }}</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>

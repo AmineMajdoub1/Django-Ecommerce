@@ -1,0 +1,813 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    /* Premium Returns Policy Dark Theme */
+    .premium-policy-hero-section {
+        position: relative;
+        min-height: 40vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, 
+            rgba(15, 15, 15, 0.95) 0%,
+            rgba(10, 10, 10, 0.98) 50%,
+            rgba(30, 30, 30, 0.95) 100%);
+        overflow: hidden;
+        padding: 4rem 0 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .background-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .floating-element {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold-primary), transparent);
+        opacity: 0.08;
+        animation: floatElement 8s ease-in-out infinite;
+    }
+
+    .el-1 {
+        width: 250px;
+        height: 250px;
+        top: -120px;
+        right: -80px;
+        animation-delay: 0s;
+    }
+
+    .el-2 {
+        width: 180px;
+        height: 180px;
+        bottom: 80px;
+        left: -40px;
+        animation-delay: 2s;
+    }
+
+    .el-3 {
+        width: 120px;
+        height: 120px;
+        top: 35%;
+        right: 15%;
+        animation-delay: 4s;
+    }
+
+    .el-4 {
+        width: 90px;
+        height: 90px;
+        bottom: 120px;
+        right: 12%;
+        animation-delay: 6s;
+    }
+
+    .gradient-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 25% 75%, rgba(198, 166, 100, 0.12) 0%, transparent 50%),
+            radial-gradient(circle at 75% 25%, rgba(214, 198, 177, 0.08) 0%, transparent 50%);
+    }
+
+    @keyframes floatElement {
+        0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+        33% { transform: translateY(-15px) rotate(120deg) scale(1.05); }
+        66% { transform: translateY(8px) rotate(240deg) scale(0.95); }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .policy-title {
+        font-family: 'Unica One', cursive;
+        font-size: 3rem;
+        color: var(--text-on-dark);
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--text-on-dark) 0%, var(--gold-primary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    .policy-subtitle {
+        color: var(--text-muted-dark);
+        font-size: 1.2rem;
+        line-height: 1.6;
+        font-weight: 300;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .premium-policy-section {
+        background: var(--bg-card);
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-dark);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .premium-policy-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(198, 166, 100, 0.03) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .premium-policy-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(198, 166, 100, 0.2);
+        background: var(--bg-card-hover);
+    }
+
+    .premium-policy-section:hover::before {
+        opacity: 1;
+    }
+
+    .section-title {
+        font-family: 'Unica One', cursive;
+        font-size: 1.8rem;
+        color: var(--text-on-dark);
+        margin-bottom: 2rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--gold-primary), transparent);
+    }
+
+    .policy-content {
+        line-height: 1.7;
+        font-size: 1.05rem;
+        color: var(--text-on-dark);
+    }
+
+    .policy-content p {
+        margin-bottom: 1.5rem;
+        color: var(--text-on-dark);
+    }
+
+    .highlight-box {
+        background: rgba(198, 166, 100, 0.1);
+        border-left: 4px solid var(--gold-primary);
+        padding: 2rem;
+        margin: 2rem 0;
+        border-radius: 0 12px 12px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .warning-box {
+        background: rgba(198, 100, 100, 0.1);
+        border-left: 4px solid #c66464;
+        padding: 2rem;
+        margin: 2rem 0;
+        border-radius: 0 12px 12px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .highlight-box::before,
+    .warning-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .highlight-box:hover::before,
+    .warning-box:hover::before {
+        left: 100%;
+    }
+
+    .policy-list {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 1.5rem 0;
+    }
+
+    .policy-list li {
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+        position: relative;
+        color: var(--text-on-dark);
+    }
+
+    .policy-list li:before {
+        content: '▸';
+        color: var(--gold-primary);
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+        font-size: 1.2rem;
+    }
+
+    .warning-list li:before {
+        color: #c66464;
+    }
+
+    .icon-box {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .icon-box:hover {
+        background: rgba(198, 166, 100, 0.05);
+        border-color: rgba(198, 166, 100, 0.2);
+        transform: translateX(5px);
+    }
+
+    .warning-icon {
+        background: rgba(198, 100, 100, 0.05);
+    }
+
+    .warning-icon:hover {
+        background: rgba(198, 100, 100, 0.1);
+        border-color: rgba(198, 100, 100, 0.3);
+    }
+
+    .icon-box i {
+        font-size: 1.5rem;
+        color: var(--gold-primary);
+        margin-right: 1.5rem;
+        width: 30px;
+        flex-shrink: 0;
+        margin-top: 0.2rem;
+    }
+
+    .warning-icon i {
+        color: #c66464;
+    }
+
+    .icon-box strong {
+        color: var(--gold-light);
+        font-weight: 600;
+    }
+
+    .premium-contact-info {
+        background: linear-gradient(135deg, rgba(198, 166, 100, 0.1), rgba(214, 198, 177, 0.05));
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        margin-top: 3rem;
+        border: 1px solid var(--border-dark);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .premium-contact-info::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(198, 166, 100, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(214, 198, 177, 0.04) 0%, transparent 50%);
+    }
+
+    .contact-title {
+        font-family: 'Unica One', cursive;
+        font-size: 1.8rem;
+        color: var(--text-on-dark);
+        margin-bottom: 1rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 2;
+    }
+
+    .contact-email {
+        font-size: 1.3rem;
+        color: var(--gold-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .contact-email:hover {
+        color: var(--gold-light);
+        transform: translateY(-2px);
+    }
+
+    .contact-email::before {
+        content: '✉';
+        font-size: 1.1rem;
+    }
+
+    /* Premium Table Styling */
+    .premium-policy-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 2rem 0;
+        background: var(--bg-card);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .premium-policy-table th {
+        background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+        color: var(--text-dark);
+        font-family: 'Unica One', cursive;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 1.5rem;
+        text-align: left;
+        border: none;
+        font-size: 1rem;
+    }
+
+    .premium-policy-table td {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border-dark);
+        background: var(--bg-card);
+        color: var(--text-on-dark);
+        transition: all 0.3s ease;
+    }
+
+    .premium-policy-table tr:hover td {
+        background: rgba(198, 166, 100, 0.05);
+    }
+
+    .premium-policy-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Premium Badges */
+    .final-sale-badge {
+        background: linear-gradient(135deg, #c66464, #a84a4a);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        box-shadow: 0 2px 8px rgba(198, 100, 100, 0.3);
+    }
+
+    .eligible-badge {
+        background: linear-gradient(135deg, #64c664, #4aa84a);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        display: inline-block;
+        box-shadow: 0 2px 8px rgba(100, 198, 100, 0.3);
+    }
+
+    /* Animation for sections */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease;
+    }
+
+    .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .premium-policy-section {
+            padding: 2rem 1.5rem;
+        }
+        
+        .policy-title {
+            font-size: 2.2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+        }
+        
+        .premium-contact-info {
+            padding: 2rem 1.5rem;
+        }
+        
+        .icon-box {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .icon-box i {
+            margin-right: 0;
+        }
+        
+        .premium-policy-table {
+            display: block;
+            overflow-x: auto;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .policy-title {
+            font-size: 1.8rem;
+            letter-spacing: 0.1em;
+        }
+        
+        .policy-subtitle {
+            font-size: 1rem;
+        }
+        
+        .premium-policy-section {
+            padding: 1.5rem;
+        }
+        
+        .contact-email {
+            font-size: 1.1rem;
+        }
+        
+        .premium-policy-table th,
+        .premium-policy-table td {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<!-- Premium Hero Section -->
+<section class="premium-policy-hero-section">
+    <div class="hero-background">
+        <div class="background-elements">
+            <div class="floating-element el-1"></div>
+            <div class="floating-element el-2"></div>
+            <div class="floating-element el-3"></div>
+            <div class="floating-element el-4"></div>
+        </div>
+        <div class="gradient-overlay"></div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="policy-title">Returns & Refunds Policy</h1>
+            <p class="policy-subtitle">Our pieces are crafted with care to last a lifetime. Please review our policies below.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Policy Content -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Overview Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Overview</h2>
+                <div class="policy-content">
+                    <p>Policies differ by product type. Please read the category that applies to your purchase.</p>
+                    
+                    <table class="premium-policy-table">
+                        <thead>
+                            <tr>
+                                <th>Product Type</th>
+                                <th>Return Policy</th>
+                                <th>Timeframe</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Custom & Made-to-Measure Hats</strong></td>
+                                <td><span class="final-sale-badge">Final Sale</span></td>
+                                <td>Not applicable</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Custom Leather Goods</strong></td>
+                                <td><span class="final-sale-badge">Final Sale</span></td>
+                                <td>Not applicable</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Hats & Leather Goods</strong></td>
+                                <td><span class="eligible-badge">Eligible</span></td>
+                                <td>14 days from delivery</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Services</strong><br><small>(reshape, reblock, clean, engraving, etc.)</small></td>
+                                <td><span class="final-sale-badge">Final Sale</span></td>
+                                <td>Not applicable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="highlight-box">
+                        <p>You can always contact us at <a href="mailto:info@lecisele.com" class="contact-email">info@lecisele.com</a> with any questions.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Custom & Made-to-Measure Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Custom & Made-to-Measure</h2>
+                <div class="policy-content">
+                    <div class="warning-box">
+                        <p><strong>All custom and made-to-measure items are FINAL SALE.</strong></p>
+                    </div>
+                    
+                    <div class="icon-box">
+                        <i class="bi bi-credit-card"></i>
+                        <div>
+                            <strong>Deposit Requirement:</strong> A 50% deposit is required to begin work on custom orders.
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box warning-icon">
+                        <i class="bi bi-x-circle"></i>
+                        <div>
+                            <strong>Cancellations:</strong> If an order is cancelled once work has begun, the 50% deposit is non-refundable.
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box">
+                        <i class="bi bi-rulers"></i>
+                        <div>
+                            <strong>Measurements Responsibility:</strong>
+                            <ul class="policy-list">
+                                <li><strong>In-person fittings:</strong> We take full responsibility for measurement accuracy</li>
+                                <li><strong>Remote orders:</strong> Responsibility rests with the client when you provide your own measurements</li>
+                            </ul>
+                            <p>We guide you through the measurement process via video to help ensure precision, but cannot guarantee fit if provided measurements are incorrect.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box">
+                        <i class="bi bi-tools"></i>
+                        <div>
+                            <strong>Post-delivery adjustments:</strong> Minor adjustments (resize, reblock, dressing tweaks) may be offered at the maker's discretion. Additional fees and return shipping costs may apply.
+                        </div>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <p><strong>No refunds, returns, or exchanges on custom / made-to-measure items.</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ready-to-Wear Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Hats & Leather Goods</h2>
+                <div class="policy-content">
+                    <div class="highlight-box">
+                        <p>We accept returns or exchanges within <strong>14 days of delivery</strong>.</p>
+                    </div>
+                    
+                    <h4 style="color: var(--text-on-dark); margin-bottom: 1rem;">Eligibility Requirements</h4>
+                    <ul class="policy-list">
+                        <li>Item must be <strong>unworn, unused, undamaged</strong>, and in original packaging (hat box, dust bag, inserts)</li>
+                        <li>Hats must show <strong>no signs of wear</strong> (no makeup, hair product, sweat, steam/water exposure, brim creases, pet hair, odours)</li>
+                    </ul>
+                    
+                    <div class="icon-box warning-icon">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div>
+                            <strong>Condition Review:</strong> Items returned without prior approval, outside the window, or not meeting the above standards will be refused and returned to you.
+                        </div>
+                    </div>
+                    
+                    <h4 style="color: var(--text-on-dark); margin-bottom: 1rem;">Return Shipping & Costs</h4>
+                    <div class="icon-box">
+                        <i class="bi bi-truck"></i>
+                        <div>
+                            <strong>Return Shipping:</strong> Customers are responsible for return shipping. If you prefer, we can issue a prepaid label and deduct the cost from your refund.
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box warning-icon">
+                        <i class="bi bi-currency-dollar"></i>
+                        <div>
+                            <strong>Non-refundable Costs:</strong> Original shipping charges, duties, and taxes are not refundable. (In some jurisdictions you may reclaim duties/taxes directly from your customs authority.)
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box warning-icon">
+                        <i class="bi bi-tag"></i>
+                        <div>
+                            <strong>Sale Items & Gift Cards:</strong> Final sale. No returns or exchanges.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How to Start a Return Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">How to Start a Return</h2>
+                <div class="policy-content">
+                    <div class="icon-box">
+                        <i class="bi bi-envelope"></i>
+                        <div>
+                            <strong>Step 1:</strong> Email <a href="mailto:info@lecisele.com" class="contact-email">info@lecisele.com</a> with your order number and reason for return.
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box">
+                        <i class="bi bi-check-circle"></i>
+                        <div>
+                            <strong>Step 2:</strong> If your return is accepted, we'll send instructions and (if requested) a prepaid return label for deduction.
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box">
+                        <i class="bi bi-geo-alt"></i>
+                        <div>
+                            <strong>Step 3:</strong> Ship to:<br>
+                            <strong>Leciselé – Returns</strong><br>
+                            1B Golden Ave.<br>
+                            Toronto, ON<br>
+                            Canada M6R 2J3
+                        </div>
+                    </div>
+                    
+                    <div class="warning-box">
+                        <p><strong>Important:</strong> Items sent back without first requesting a return will not be accepted.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exchanges Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Exchanges</h2>
+                <div class="policy-content">
+                    <div class="icon-box">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <div>
+                            <p>Exchanges are handled on a case-by-case basis. If you'd like to request one, please email us at <a href="mailto:info@lecisele.com" class="contact-email">info@lecisele.com</a> with your order number and the item/size you'd like instead.</p>
+                            <p>We'll confirm availability and let you know the next steps.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Damages and Issues Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Damages and Issues</h2>
+                <div class="policy-content">
+                    <div class="icon-box">
+                        <i class="bi bi-shield-exclamation"></i>
+                        <div>
+                            <p>If you receive a defective, damaged, or incorrect item, please contact us immediately so we can evaluate and make it right.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box">
+                        <i class="bi bi-box-seam"></i>
+                        <div>
+                            <p><strong>For shipping damage:</strong> Keep all packaging and provide photos of the outer box, inner packaging, and the item.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Services</h2>
+                <div class="policy-content">
+                    <div class="warning-box">
+                        <p><strong>All services are FINAL SALE once performed.</strong></p>
+                    </div>
+                    
+                    <p>This includes but is not limited to:</p>
+                    <ul class="policy-list">
+                        <li>Reshaping</li>
+                        <li>Reblocking</li>
+                        <li>Cleaning</li>
+                        <li>Engraving</li>
+                        <li>Alterations</li>
+                        <li>All other services</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Refunds Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Refunds</h2>
+                <div class="policy-content">
+                    <div class="icon-box">
+                        <i class="bi bi-bell"></i>
+                        <div>
+                            <p>We'll notify you once we've received and inspected your return and let you know if the refund is approved.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box">
+                        <i class="bi bi-credit-card-2-front"></i>
+                        <div>
+                            <p>If approved, refunds are issued to the original payment method within <strong>10 business days</strong> (bank/credit card processing times may vary).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="icon-box">
+                        <i class="bi bi-clock-history"></i>
+                        <div>
+                            <p>If more than <strong>15 business days</strong> have passed since your refund approval, please contact <a href="mailto:info@lecisele.com" class="contact-email">info@lecisele.com</a>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premium Contact Information -->
+            <div class="premium-contact-info fade-in-up">
+                <h3 class="contact-title">Need Assistance With a Return?</h3>
+                <p class="policy-content" style="margin-bottom: 1.5rem;">Contact our customer service team for any returns or refund inquiries</p>
+                <a href="mailto:info@lecisele.com" class="contact-email">info@lecisele.com</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add floating elements dynamically
+    document.addEventListener('DOMContentLoaded', function() {
+        const heroSection = document.querySelector('.premium-policy-hero-section');
+        if (heroSection) {
+            const floatingContainer = document.createElement('div');
+            floatingContainer.className = 'floating-elements';
+            floatingContainer.innerHTML = `
+                <div class="floating-element" style="width: 200px; height: 200px; top: 10%; right: -50px; animation-delay: 0s;"></div>
+                <div class="floating-element" style="width: 150px; height: 150px; bottom: 20%; left: -30px; animation-delay: 2s;"></div>
+                <div class="floating-element" style="width: 100px; height: 100px; top: 40%; right: 15%; animation-delay: 4s;"></div>
+            `;
+            heroSection.appendChild(floatingContainer);
+        }
+
+        // Animation observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements with fade-in-up class
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+    });
+</script>
+
+{% endblock %}

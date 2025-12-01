@@ -1,0 +1,453 @@
+/* Premium Register Styles for Leciselé Dark Theme */
+
+.premium-register-section {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, 
+        rgba(15, 15, 15, 0.95) 0%,
+        rgba(10, 10, 10, 0.98) 50%,
+        rgba(30, 30, 30, 0.95) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-register-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 25% 25%, rgba(198, 166, 100, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(214, 198, 177, 0.05) 0%, transparent 50%);
+    z-index: 1;
+}
+
+.premium-register-section > .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Register Header */
+.premium-register-header {
+    margin-bottom: 3rem;
+}
+
+.register-brand-presentation {
+    text-align: center;
+}
+
+.register-logo-container {
+    margin-bottom: 2rem;
+}
+
+.register-logo {
+    width: 200px;
+    height: auto;
+    filter: brightness(0) invert(1);
+    opacity: 0.9;
+}
+
+.register-title {
+    font-family: 'Unica One', cursive;
+    font-size: 2.5rem;
+    color: var(--text-on-dark);
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--text-on-dark) 0%, var(--gold-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.register-subtitle {
+    color: var(--text-muted-dark);
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+.register-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.divider-line {
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--gold-primary), transparent);
+}
+
+.divider-line:last-child {
+    background: linear-gradient(90deg, transparent, var(--gold-primary));
+}
+
+.divider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--gold-primary);
+    animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+/* Premium Register Card */
+.premium-register-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-dark);
+    backdrop-filter: blur(10px);
+    position: relative;
+    overflow: hidden;
+}
+
+.premium-register-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold-primary), var(--gold-light));
+}
+
+/* Premium Form Fields */
+.premium-form-fields {
+    margin-bottom: 1rem;
+}
+
+.form-group-premium {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 1.2rem;
+    color: var(--gold-primary);
+    font-size: 1.1rem;
+    z-index: 2;
+}
+
+/* Style Django form inputs - WHITE TEXT COLOR */
+.premium-register-card input {
+    width: 100%;
+    padding: 1rem 1.2rem 1rem 3rem;
+    background: var(--bg-dark);
+    border: 1px solid var(--border-dark);
+    border-radius: 12px;
+    color: #FFFFFF !important; /* Force white text color */
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Ensure text remains white in all states */
+.premium-register-card input:focus {
+    outline: none;
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 0 3px rgba(198, 166, 100, 0.1);
+    background: var(--bg-card-hover);
+    color: #FFFFFF !important; /* White text on focus */
+}
+
+.premium-register-card input:hover {
+    color: #FFFFFF !important; /* White text on hover */
+}
+
+.premium-register-card input::placeholder {
+    color: var(--text-muted-dark);
+}
+
+/* Force white autofill background and text */
+.premium-register-card input:-webkit-autofill,
+.premium-register-card input:-webkit-autofill:hover, 
+.premium-register-card input:-webkit-autofill:focus, 
+.premium-register-card input:-webkit-autofill:active {
+    -webkit-text-fill-color: #FFFFFF !important;
+    -webkit-box-shadow: 0 0 0px 1000px var(--bg-dark) inset !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Django Form Help Text Styling */
+.premium-register-card .form-text {
+    font-size: 0.8rem !important;
+    color: var(--text-muted-dark) !important;
+    margin-top: 0.5rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+
+.premium-register-card .form-text.text-muted {
+    color: var(--text-muted-dark) !important;
+}
+
+.premium-register-card .form-text small {
+    font-size: 0.8rem !important;
+    color: var(--text-muted-dark) !important;
+    line-height: 1.4 !important;
+}
+
+/* Custom Form Help Text */
+.form-help-text {
+    font-size: 0.8rem;
+    color: var(--text-muted-dark);
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-help-text i {
+    color: var(--gold-primary);
+    font-size: 0.7rem;
+}
+
+/* Form Errors */
+.form-errors {
+    margin-top: 0.5rem;
+}
+
+.error-text {
+    font-size: 0.8rem;
+    color: #ff6b6b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.error-text i {
+    font-size: 0.7rem;
+}
+
+/* Django Error List Styling */
+.premium-register-card .errorlist {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0.5rem 0 0 0 !important;
+}
+
+.premium-register-card .errorlist li {
+    color: #ff6b6b !important;
+    font-size: 0.8rem !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    margin-bottom: 0.25rem !important;
+}
+
+.premium-register-card .errorlist li:before {
+    content: "⚠️" !important;
+    font-size: 0.7rem !important;
+}
+
+/* Register Submit Button */
+.register-submit-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    border-radius: 12px;
+    margin-top: 1rem;
+}
+
+/* Divider Section */
+.register-divider-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    color: var(--text-muted-dark);
+}
+
+.register-divider-section .divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border-dark), transparent);
+}
+
+.register-divider-section .divider-line:last-child {
+    background: linear-gradient(90deg, transparent, var(--border-dark));
+}
+
+.divider-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-muted-dark);
+    white-space: nowrap;
+}
+
+/* Google Register Button */
+.google-register-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem 2rem;
+    border-radius: 12px;
+    gap: 0.75rem;
+}
+
+.google-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Login Link */
+.login-link-text {
+    color: var(--text-muted-dark);
+    margin: 0;
+    font-size: 1rem;
+}
+
+.login-cta {
+    color: var(--gold-primary);
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.login-cta:hover {
+    color: var(--gold-light);
+    gap: 0.5rem;
+}
+
+/* Floating Elements for Background */
+.premium-register-section .floating-elements {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.premium-register-section .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-primary), transparent);
+    opacity: 0.05;
+    animation: floatElement 8s ease-in-out infinite;
+}
+
+.premium-register-section .el-1 {
+    width: 350px;
+    height: 350px;
+    top: 5%;
+    left: -150px;
+    animation-delay: 0s;
+}
+
+.premium-register-section .el-2 {
+    width: 250px;
+    height: 250px;
+    bottom: 10%;
+    right: -100px;
+    animation-delay: 2s;
+}
+
+.premium-register-section .el-3 {
+    width: 180px;
+    height: 180px;
+    top: 40%;
+    left: 10%;
+    animation-delay: 4s;
+}
+
+@keyframes floatElement {
+    0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+    33% { transform: translateY(-30px) rotate(120deg) scale(1.05); }
+    66% { transform: translateY(15px) rotate(240deg) scale(0.95); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .premium-register-card {
+        padding: 2rem 1.5rem;
+        margin: 0 1rem;
+    }
+    
+    .register-logo {
+        width: 160px;
+    }
+    
+    .register-title {
+        font-size: 2rem;
+    }
+    
+    .premium-register-card input {
+        padding: 0.875rem 1rem 0.875rem 2.8rem;
+    }
+    
+    .input-icon {
+        left: 1rem;
+    }
+    
+    .premium-register-card .form-text,
+    .premium-register-card .form-text small {
+        font-size: 0.75rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .premium-register-section {
+        min-height: 90vh;
+    }
+    
+    .premium-register-card {
+        padding: 1.5rem 1rem;
+    }
+    
+    .register-title {
+        font-size: 1.75rem;
+    }
+    
+    .register-subtitle {
+        font-size: 1rem;
+    }
+    
+    .premium-form-fields {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Animation for form elements */
+.premium-register-card .form-group-premium {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+.premium-register-card .form-group-premium:nth-child(1) { animation-delay: 0.1s; }
+.premium-register-card .form-group-premium:nth-child(2) { animation-delay: 0.2s; }
+.premium-register-card .form-group-premium:nth-child(3) { animation-delay: 0.3s; }
+.premium-register-card .form-group-premium:nth-child(4) { animation-delay: 0.4s; }
+.premium-register-card .register-submit-btn { animation-delay: 0.5s; }
+.premium-register-card .google-register-btn { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

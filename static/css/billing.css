@@ -1,0 +1,661 @@
+/* Premium Billing Styles - Dark Theme */
+
+.premium-billing-hero-section {
+    position: relative;
+    min-height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, 
+        rgba(15, 15, 15, 0.95) 0%,
+        rgba(10, 10, 10, 0.98) 50%,
+        rgba(30, 30, 30, 0.95) 100%);
+    overflow: hidden;
+    padding: 1.5rem 0;
+}
+
+.premium-billing-section {
+    background: var(--bg-dark);
+    position: relative;
+    overflow: hidden;
+    padding: 3rem 0;
+}
+
+.premium-billing-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(198, 166, 100, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(214, 198, 177, 0.03) 0%, transparent 50%);
+    z-index: 1;
+}
+
+.premium-billing-section > .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* Hero Background Elements */
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.background-elements {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.floating-element {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-primary), transparent);
+    opacity: 0.08;
+    animation: floatElement 8s ease-in-out infinite;
+}
+
+.el-1 {
+    width: 250px;
+    height: 250px;
+    top: -120px;
+    right: -80px;
+    animation-delay: 0s;
+}
+
+.el-2 {
+    width: 180px;
+    height: 180px;
+    bottom: 80px;
+    left: -40px;
+    animation-delay: 2s;
+}
+
+.el-3 {
+    width: 120px;
+    height: 120px;
+    top: 35%;
+    right: 15%;
+    animation-delay: 4s;
+}
+
+.el-4 {
+    width: 90px;
+    height: 90px;
+    bottom: 120px;
+    right: 12%;
+    animation-delay: 6s;
+}
+
+.gradient-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(circle at 25% 75%, rgba(198, 166, 100, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 75% 25%, rgba(214, 198, 177, 0.08) 0%, transparent 50%);
+}
+
+@keyframes floatElement {
+    0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+    33% { transform: translateY(-15px) rotate(120deg) scale(1.05); }
+    66% { transform: translateY(8px) rotate(240deg) scale(0.95); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.brand-presentation {
+    margin-bottom: 2rem;
+}
+
+.logo-glow {
+    width: 50px;
+    height: 50px;
+    background: radial-gradient(circle, var(--gold-primary) 0%, transparent 70%);
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    opacity: 0.3;
+    animation: glowPulse 4s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.1); }
+}
+
+.brand-title {
+    font-family: 'Unica One', cursive;
+    color: var(--text-on-dark);
+    margin-bottom: 1rem;
+}
+
+.title-main {
+    display: block;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--text-on-dark) 0%, var(--gold-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.title-subtitle {
+    display: block;
+    font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    color: var(--text-muted-dark);
+    text-transform: uppercase;
+}
+
+.hero-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    margin: 1rem 0;
+}
+
+.divider-line {
+    width: 30px;
+    height: 1px;
+    background: linear-gradient(90deg, var(--gold-primary), transparent);
+}
+
+.divider-line:last-child {
+    background: linear-gradient(90deg, transparent, var(--gold-primary));
+}
+
+.divider-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--gold-primary);
+    animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.7; }
+}
+
+.hero-tagline {
+    font-size: clamp(0.9rem, 1.8vw, 1.1rem);
+    color: var(--text-muted-dark);
+    line-height: 1.6;
+    font-weight: 300;
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+/* Billing Layout */
+.billing-layout {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 3rem;
+    align-items: start;
+}
+
+/* Summary Cards */
+.summary-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-dark);
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(198, 166, 100, 0.2);
+    background: var(--bg-card-hover);
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    color: var(--text-dark);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card-header i {
+    font-size: 1.5rem;
+}
+
+.card-title {
+    font-family: 'Unica One', cursive;
+    font-size: 1.3rem;
+    margin: 0;
+    letter-spacing: 0.05em;
+    color: var(--text-dark) !important;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Order Items */
+.order-items {
+    margin-bottom: 2rem;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.item-info {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 600;
+    color: var(--text-on-dark) !important;
+    margin-bottom: 0.5rem;
+    font-size: 1rem;
+}
+
+.item-size {
+    margin: 0.25rem 0;
+}
+
+.item-size small {
+    color: var(--text-muted-dark);
+}
+
+.item-size strong {
+    color: var(--gold-light);
+}
+
+.item-price {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.price-sale {
+    color: #FF6B6B;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.price-original {
+    text-decoration: line-through;
+    color: var(--text-muted-dark);
+    font-size: 0.9rem;
+}
+
+.price-current {
+    color: var(--text-on-dark) !important;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.item-quantity {
+    text-align: right;
+}
+
+.quantity-label {
+    color: var(--text-muted-dark);
+    font-size: 0.8rem;
+    display: block;
+}
+
+.quantity-value {
+    color: var(--text-on-dark) !important;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.item-divider {
+    height: 1px;
+    background: var(--border-dark);
+    margin: 1rem 0;
+}
+
+.order-total {
+    border-top: 2px solid var(--border-dark);
+    padding-top: 1.5rem;
+}
+
+.total-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.total-label {
+    font-weight: 600;
+    color: var(--text-on-dark) !important;
+    font-size: 1.1rem;
+}
+
+.total-amount {
+    font-family: 'Unica One', cursive;
+    font-size: 1.5rem;
+    color: var(--gold-primary);
+    font-weight: 700;
+}
+
+.card-actions {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+/* Shipping Details */
+.shipping-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    color: var(--text-on-dark) !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+    min-width: 100px;
+}
+
+.detail-value {
+    color: var(--text-on-dark) !important;
+    font-weight: 500;
+    text-align: right;
+    flex: 1;
+}
+
+/* Confirmation Card */
+.confirmation-card {
+    border-left: 4px solid var(--gold-primary);
+}
+
+.confirmation-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.confirmation-icon {
+    color: var(--gold-primary);
+    font-size: 1.5rem;
+    margin-top: 0.2rem;
+    flex-shrink: 0;
+}
+
+.confirmation-text {
+    color: var(--text-muted-dark);
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Payment Sidebar */
+.payment-sidebar {
+    position: sticky;
+    top: 2rem;
+}
+
+.payment-card {
+    background: var(--bg-card);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-dark);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.payment-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(198, 166, 100, 0.2);
+}
+
+.payment-header {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    color: var(--text-dark);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.payment-title {
+    font-family: 'Unica One', cursive;
+    font-size: 1.3rem;
+    margin: 0;
+    letter-spacing: 0.05em;
+    color: var(--text-dark) !important;
+}
+
+.payment-options {
+    padding: 2rem;
+}
+
+.payment-option {
+    margin-bottom: 2rem;
+}
+
+.payment-option:last-child {
+    margin-bottom: 0;
+}
+
+.option-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-dark);
+}
+
+.option-header i {
+    font-size: 1.3rem;
+    color: var(--gold-primary);
+}
+
+.paypal-icon {
+    color: #003087 !important;
+}
+
+.option-title {
+    font-weight: 600;
+    color: var(--text-on-dark) !important;
+    font-size: 1.1rem;
+}
+
+.option-content {
+    text-align: center;
+}
+
+/* Payment Button */
+.btn-premium.full-width {
+    width: 100%;
+    padding: 1.2rem 1.5rem;
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    color: var(--text-dark);
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-premium.full-width:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(198, 166, 100, 0.3);
+}
+
+.payment-amount {
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+/* Buttons */
+.btn-premium, .btn-premium-outline {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-premium {
+    background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+    color: var(--text-dark);
+}
+
+.btn-premium-outline {
+    background: transparent;
+    color: var(--gold-primary);
+    border: 1px solid var(--gold-primary);
+}
+
+.btn-premium:hover, .btn-premium-outline:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(198, 166, 100, 0.3);
+}
+
+.btn-premium-outline:hover {
+    background: var(--gold-primary);
+    color: var(--text-dark);
+}
+
+/* Security Badges */
+.security-badges {
+    display: flex;
+    justify-content: space-around;
+    padding: 1.5rem 2rem;
+    background: rgba(198, 166, 100, 0.05);
+    border-top: 1px solid var(--border-dark);
+}
+
+.badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted-dark);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.badge-item i {
+    color: var(--gold-primary);
+    font-size: 1.2rem;
+}
+
+.badge-item span {
+    color: var(--text-muted-dark) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .billing-layout {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .payment-sidebar {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .order-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .item-quantity {
+        text-align: left;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .detail-value {
+        text-align: left;
+    }
+    
+    .security-badges {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .premium-billing-hero-section {
+        min-height: 30vh;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-body {
+        padding: 1.25rem;
+    }
+    
+    .payment-options {
+        padding: 1.5rem;
+    }
+    
+    .title-main {
+        font-size: 1.8rem;
+    }
+    
+    .btn-premium, .btn-premium-outline {
+        padding: 0.875rem 1.25rem;
+        font-size: 0.85rem;
+    }
+}

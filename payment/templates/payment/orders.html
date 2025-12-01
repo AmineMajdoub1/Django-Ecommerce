@@ -1,0 +1,965 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- ==================== PREMIUM ORDER DETAIL HEADER ==================== -->
+<header class="premium-hero-section">
+  <div class="hero-background">
+    <div class="background-elements">
+      <div class="floating-element el-1"></div>
+      <div class="floating-element el-2"></div>
+      <div class="floating-element el-3"></div>
+      <div class="floating-element el-4"></div>
+    </div>
+    <div class="gradient-overlay"></div>
+  </div>
+  
+  <div class="container">
+    <div class="hero-content">
+      <div class="brand-presentation">
+        <div class="logo-glow"></div>
+        <h1 class="brand-title">
+          <span class="title-main">Order Details</span>
+          <span class="title-subtitle">ORDER #{{ order.id }}</span>
+        </h1>
+        <div class="hero-divider">
+          <div class="divider-line"></div>
+          <div class="divider-dot"></div>
+          <div class="divider-line"></div>
+        </div>
+        <p class="hero-tagline">Complete order information and management</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== PREMIUM ORDER DETAIL SECTION ==================== -->
+<section class="premium-order-detail-section py-6">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-xxl-8 col-xl-9 col-lg-10">
+        
+        <!-- Premium Order Card -->
+        <div class="premium-card order-detail-card fade-in-up">
+          <!-- Order Header -->
+          <div class="order-header lecisele-header">
+            <div class="header-main">
+              <div class="order-badge">
+                <i class="bi bi-receipt"></i>
+                <span class="order-number">#{{ order.id }}</span>
+              </div>
+              <div class="order-amount">
+                <span class="amount-label">Total Amount</span>
+                <span class="amount-value">${{ order.amount_paid }}</span>
+              </div>
+            </div>
+            <div class="header-status {% if order.shipped %}status-shipped{% else %}status-pending{% endif %}">
+              <i class="bi {% if order.shipped %}bi-check-circle{% else %}bi-clock{% endif %}"></i>
+              <span class="status-text">{% if order.shipped %}Shipped{% else %}Pending{% endif %}</span>
+            </div>
+          </div>
+
+          <!-- Order Body -->
+          <div class="order-body">
+            <!-- Customer Information -->
+            <div class="info-section">
+              <h4 class="section-title">
+                <i class="bi bi-person"></i>
+                Customer Information
+              </h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Email</span>
+                  <span class="info-value">{{ order.email }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Full Name</span>
+                  <span class="info-value">{{ order.full_name }}</span>
+                </div>
+                <div class="info-item full-width">
+                  <span class="info-label">Date {% if order.shipped %}Shipped{% else %}Ordered{% endif %}</span>
+                  <span class="info-value">
+                    {% if order.date_shipped %}
+                      {{ order.date_shipped }}
+                    {% else %}
+                      {{ order.date_ordered }}
+                    {% endif %}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="info-section">
+              <h4 class="section-title">
+                <i class="bi bi-geo-alt"></i>
+                Shipping Address
+              </h4>
+              <div class="address-container">
+                <div class="address-content">
+                  <pre>{{ order.shipping_address }}</pre>
+                </div>
+                <div class="address-actions">
+                  <button class="btn-copy-address" data-address="{{ order.shipping_address }}">
+                    <i class="bi bi-clipboard"></i>
+                    Copy Address
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="info-section">
+              <h4 class="section-title">
+                <i class="bi bi-bag"></i>
+                Order Items ({{ items|length }})
+              </h4>
+              <div class="items-container">
+                {% for item in items %}
+                <div class="order-item fade-in-up">
+                  <div class="item-info">
+                    <div class="item-name">{{ item.product }}</div>
+                    <div class="item-meta">
+                      <span class="item-quantity">Quantity: {{ item.quantity }}</span>
+                      <span class="item-separator">•</span>
+                      <span class="item-price">${{ item.price }} each</span>
+                    </div>
+                  </div>
+                  <div class="item-total">
+                    <span class="total-amount">${{ item.total_price|default:item.price }}</span>
+                  </div>
+                </div>
+                {% if not forloop.last %}
+                <div class="item-divider"></div>
+                {% endif %}
+                {% endfor %}
+                
+                <!-- Order Total -->
+                <div class="order-total">
+                  <div class="total-line">
+                    <span class="total-label">Order Total:</span>
+                    <span class="total-amount">${{ order.amount_paid }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Order Actions -->
+            <div class="actions-section">
+              <div class="actions-content">
+                {% if not order.shipped %}
+                <form method="POST" class="status-form ship-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="shipping_status" value="true">
+                  <button type="submit" class="btn-action btn-ship">
+                    <i class="bi bi-truck"></i>
+                    Mark as Shipped
+                    <span class="action-tooltip">Update order status to shipped</span>
+                  </button>
+                </form>
+                {% else %}
+                <form method="POST" class="status-form unship-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="shipping_status" value="false">
+                  <button type="submit" class="btn-action btn-unship">
+                    <i class="bi bi-arrow-counterclockwise"></i>
+                    Mark as Not Shipped
+                    <span class="action-tooltip">Revert order status to pending</span>
+                  </button>
+                </form>
+                {% endif %}
+                
+                <div class="action-links">
+                  <a href="{% if order.shipped %}{% url 'shipped_dash' %}{% else %}{% url 'not_shipped_dash' %}{% endif %}" class="btn-link">
+                    <i class="bi bi-arrow-left"></i>
+                    Back to Orders
+                  </a>
+                  <a href="{% url 'home' %}" class="btn-link">
+                    <i class="bi bi-house"></i>
+                    Return Home
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ==================== PREMIUM ORDER DETAIL SECTION STYLES ==================== */
+.premium-order-detail-section {
+  background: var(--bg-dark);
+  min-height: 70vh;
+}
+
+/* Order Detail Card */
+.order-detail-card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-dark);
+}
+
+/* Order Header */
+.order-header {
+  background: linear-gradient(135deg, 
+    rgba(26, 26, 26, 0.95) 0%,
+    rgba(30, 30, 30, 0.9) 100%);
+  padding: 2rem;
+  border-bottom: 1px solid var(--border-dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(20px);
+}
+
+.header-main {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.order-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(198, 166, 100, 0.1);
+  border: 1px solid rgba(198, 166, 100, 0.3);
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+}
+
+.order-badge i {
+  font-size: 1.5rem;
+  color: var(--gold-primary);
+}
+
+.order-number {
+  font-family: 'Unica One', cursive;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-on-dark);
+  letter-spacing: 1px;
+}
+
+.order-amount {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.amount-label {
+  color: var(--text-muted-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.amount-value {
+  font-family: 'Unica One', cursive;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--gold-primary);
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.status-pending {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  color: #ffc107;
+}
+
+.status-shipped {
+  background: rgba(40, 167, 69, 0.1);
+  border: 1px solid rgba(40, 167, 69, 0.3);
+  color: #28a745;
+}
+
+.header-status i {
+  font-size: 1.2rem;
+}
+
+/* Order Body */
+.order-body {
+  padding: 2rem;
+}
+
+.info-section {
+  margin-bottom: 2.5rem;
+}
+
+.info-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-family: 'Unica One', cursive;
+  font-size: 1.4rem;
+  color: var(--text-on-dark);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-dark);
+}
+
+.section-title i {
+  color: var(--gold-primary);
+  font-size: 1.2rem;
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-label {
+  color: var(--text-muted-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value {
+  color: var(--text-on-dark);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Address Container */
+.address-container {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.address-content {
+  padding: 1.5rem;
+}
+
+.address-content pre {
+  color: var(--text-on-dark);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.address-actions {
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1px solid var(--border-dark);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-copy-address {
+  background: transparent;
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  color: var(--text-muted-dark);
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-copy-address:hover {
+  background: var(--gold-primary);
+  color: var(--text-dark);
+  border-color: var(--gold-primary);
+}
+
+/* Items Container */
+.items-container {
+  background: var(--bg-dark);
+  border: 1px solid var(--border-dark);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.order-item:hover {
+  background: var(--bg-card-hover);
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-name {
+  color: var(--text-on-dark);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-muted-dark);
+  font-size: 0.9rem;
+}
+
+.item-separator {
+  color: var(--border-dark);
+}
+
+.item-total {
+  text-align: right;
+}
+
+.total-amount {
+  color: var(--gold-primary);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.item-divider {
+  height: 1px;
+  background: var(--border-dark);
+  margin: 0 1.5rem;
+}
+
+.order-total {
+  padding: 1.5rem;
+  background: rgba(198, 166, 100, 0.05);
+  border-top: 1px solid var(--border-dark);
+}
+
+.total-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.total-label {
+  color: var(--text-on-dark);
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.total-amount {
+  color: var(--gold-primary);
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Actions Section */
+.actions-section {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-dark);
+}
+
+.actions-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.status-form {
+  margin: 0;
+}
+
+.btn-action {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  border: none;
+  border-radius: 12px;
+  color: var(--text-dark);
+  padding: 1rem 2rem;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-action::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-action:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(198, 166, 100, 0.3);
+}
+
+.btn-action:hover::before {
+  left: 100%;
+}
+
+.btn-unship {
+  background: linear-gradient(135deg, #6c757d, #495057);
+}
+
+.btn-unship:hover {
+  box-shadow: 0 8px 25px rgba(108, 117, 125, 0.3);
+}
+
+.action-tooltip {
+  position: absolute;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-dark);
+  color: var(--text-muted-dark);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  border: 1px solid var(--border-dark);
+}
+
+.btn-action:hover .action-tooltip {
+  opacity: 1;
+  bottom: -35px;
+}
+
+.action-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-link {
+  background: transparent;
+  border: 1px solid var(--border-dark);
+  border-radius: 8px;
+  color: var(--text-muted-dark);
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-link:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-on-dark);
+  border-color: var(--gold-primary);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .order-header {
+    padding: 1.5rem;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  
+  .header-main {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .order-body {
+    padding: 1.5rem;
+  }
+  
+  .actions-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .action-links {
+    justify-content: center;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .premium-order-detail-section {
+    padding: 2rem 0;
+  }
+  
+  .order-number {
+    font-size: 1.5rem;
+  }
+  
+  .amount-value {
+    font-size: 1.8rem;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .order-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .item-total {
+    align-self: flex-end;
+  }
+  
+  .section-title {
+    font-size: 1.2rem;
+  }
+  
+  .btn-action {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9rem;
+    justify-content: center;
+  }
+  
+  .action-links {
+    flex-direction: column;
+  }
+  
+  .btn-link {
+    justify-content: center;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .order-header {
+    padding: 1.25rem;
+  }
+  
+  .order-badge {
+    padding: 0.75rem 1rem;
+  }
+  
+  .order-number {
+    font-size: 1.3rem;
+  }
+  
+  .amount-value {
+    font-size: 1.6rem;
+  }
+  
+  .header-status {
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .order-body {
+    padding: 1.25rem;
+  }
+  
+  .address-content,
+  .address-actions {
+    padding: 1rem;
+  }
+  
+  .order-item {
+    padding: 1rem;
+  }
+  
+  .order-total {
+    padding: 1rem;
+  }
+  
+  .total-label {
+    font-size: 1.1rem;
+  }
+  
+  .total-amount {
+    font-size: 1.3rem;
+  }
+}
+
+/* ==================== ANIMATIONS ==================== */
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.order-item {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.order-item:nth-child(1) { animation-delay: 0.1s; }
+.order-item:nth-child(2) { animation-delay: 0.2s; }
+.order-item:nth-child(3) { animation-delay: 0.3s; }
+.order-item:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== ENHANCED INTERACTIONS ==================== */
+.btn-action:active {
+  transform: translateY(0);
+}
+
+.btn-action.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.btn-action.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--text-dark);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.btn-action.success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.btn-copy-address.copied {
+  background: var(--gold-primary);
+  color: var(--text-dark);
+  border-color: var(--gold-primary);
+}
+
+.btn-copy-address.copied::before {
+  content: '✓ Copied!';
+  position: absolute;
+  background: var(--bg-dark);
+  color: var(--text-on-dark);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  bottom: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  border: 1px solid var(--border-dark);
+}
+</style>
+
+<script>
+// Enhanced interactions for the order detail page
+document.addEventListener('DOMContentLoaded', function() {
+  // Copy address functionality
+  const copyAddressBtn = document.querySelector('.btn-copy-address');
+  if (copyAddressBtn) {
+    copyAddressBtn.addEventListener('click', function() {
+      const address = this.getAttribute('data-address');
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(address).then(() => {
+        // Show success state
+        this.classList.add('copied');
+        this.innerHTML = '<i class="bi bi-check"></i>Copied!';
+        
+        // Reset after delay
+        setTimeout(() => {
+          this.classList.remove('copied');
+          this.innerHTML = '<i class="bi bi-clipboard"></i>Copy Address';
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy address: ', err);
+      });
+    });
+  }
+  
+  // Add loading states to status forms
+  const statusForms = document.querySelectorAll('.status-form');
+  
+  statusForms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const button = this.querySelector('.btn-action');
+      const originalText = button.innerHTML;
+      
+      // Add loading state
+      button.classList.add('loading');
+      button.disabled = true;
+      
+      // Keep original text but add loading
+      const textContent = button.textContent.trim();
+      button.innerHTML = `<i class="bi bi-arrow-repeat"></i>${textContent}`;
+      
+      // Allow form to submit normally after showing loading state
+      setTimeout(() => {
+        this.submit();
+      }, 500);
+    });
+  });
+  
+  // Add floating elements to order section
+  const orderSection = document.querySelector('.premium-order-detail-section');
+  if (orderSection) {
+    const floatingContainer = document.createElement('div');
+    floatingContainer.className = 'floating-elements';
+    floatingContainer.innerHTML = `
+      <div class="floating-element" style="width: 100px; height: 100px; top: 15%; right: -20px; animation-delay: 0s;"></div>
+      <div class="floating-element" style="width: 70px; height: 70px; bottom: 25%; left: -12px; animation-delay: 2s;"></div>
+      <div class="floating-element" style="width: 50px; height: 50px; top: 65%; right: 12%; animation-delay: 4s;"></div>
+    `;
+    orderSection.appendChild(floatingContainer);
+  }
+  
+  // Add intersection observer for animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, observerOptions);
+  
+  // Observe elements with fade-in-up class
+  document.querySelectorAll('.fade-in-up').forEach(el => {
+    observer.observe(el);
+  });
+  
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      // Go back to appropriate orders list
+      const backUrl = "{% if order.shipped %}{% url 'shipped_dash' %}{% else %}{% url 'not_shipped_dash' %}{% endif %}";
+      window.location.href = backUrl;
+    }
+  });
+});
+
+// Real-time status updates (if using WebSockets)
+function updateOrderStatus(newStatus) {
+  const statusElement = document.querySelector('.header-status');
+  const statusText = document.querySelector('.status-text');
+  const actionForm = document.querySelector('.status-form');
+  
+  if (statusElement && statusText && actionForm) {
+    if (newStatus === 'shipped') {
+      statusElement.className = 'header-status status-shipped';
+      statusElement.innerHTML = '<i class="bi bi-check-circle"></i><span class="status-text">Shipped</span>';
+      
+      // Update action button
+      actionForm.innerHTML = `
+        {% csrf_token %}
+        <input type="hidden" name="shipping_status" value="false">
+        <button type="submit" class="btn-action btn-unship">
+          <i class="bi bi-arrow-counterclockwise"></i>
+          Mark as Not Shipped
+          <span class="action-tooltip">Revert order status to pending</span>
+        </button>
+      `;
+    } else {
+      statusElement.className = 'header-status status-pending';
+      statusElement.innerHTML = '<i class="bi bi-clock"></i><span class="status-text">Pending</span>';
+      
+      // Update action button
+      actionForm.innerHTML = `
+        {% csrf_token %}
+        <input type="hidden" name="shipping_status" value="true">
+        <button type="submit" class="btn-action btn-ship">
+          <i class="bi bi-truck"></i>
+          Mark as Shipped
+          <span class="action-tooltip">Update order status to shipped</span>
+        </button>
+      `;
+    }
+    
+    // Re-attach event listeners
+    initializeFormListeners();
+  }
+}
+
+function initializeFormListeners() {
+  // Re-initialize form listeners after dynamic content changes
+  const statusForms = document.querySelectorAll('.status-form');
+  statusForms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      // Your form submission logic here
+    });
+  });
+}
+</script>
+
+{% endblock %}

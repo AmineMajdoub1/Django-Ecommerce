@@ -1,0 +1,893 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+
+<!-- ==================== PREMIUM HERO HEADER ==================== -->
+<header class="premium-hero-section">
+  
+  <div class="hero-background">
+    <div class="background-elements">
+      <div class="floating-element el-1"></div>
+      <div class="floating-element el-2"></div>
+      <div class="floating-element el-3"></div>
+      <div class="floating-element el-4"></div>
+    </div>
+    <div class="gradient-overlay"></div>
+  </div>
+  
+  <div class="container">
+    <div class="hero-content">
+      <!-- INLINE STYLES ONLY -->
+      <div style="text-align: center; margin: 0 auto 2rem auto;">
+        <img src="/media/uploads/product/lo.png" alt="Leciselé" 
+             style="width: 350px; height: auto; display: block; margin: 0 auto;">
+      </div>
+      
+      <div class="hero-divider">
+        <div class="divider-line"></div>
+        <div class="divider-dot"></div>
+        <div class="divider-line"></div>
+      </div>
+      
+      <p class="hero-tagline" style="text-align: center;">Experience the art of French craftsmanship in every piece</p>
+      
+      <div class="hero-actions">
+        <a href="#products" class="btn-premium hero-cta">
+          <span>Discover Collection</span>
+          <i class="bi bi-arrow-down"></i>
+        </a>
+        <a href="{% url 'search' %}" class="btn-premium-outline hero-cta">
+          <span>Explore All</span>
+          <i class="bi bi-search"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ==================== FEATURED PRODUCTS ==================== -->
+<section id="products" class="featured-products py-5">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="header-content">
+        <h2 class="section-title">Featured Collection</h2>
+        <p class="section-subtitle">Discover our handpicked selection of premium pieces</p>
+        <div class="section-decoration">
+          <div class="decoration-line"></div>
+          <div class="decoration-dot"></div>
+          <div class="decoration-line"></div>
+        </div>
+      </div>
+      <a href="{% url 'search' %}" class="view-all-link">
+        View All <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+
+    <!-- Products Grid with Ultra Premium Badges -->
+    {% if products %}
+    <div class="products-grid">
+        {% for product in products %}
+        <div class="product-card {% if product.sold_out %}sold-out{% endif %}">
+            <div class="product-image">
+                <img loading="lazy" src="{{ product.image.url }}" alt="{{ product.name }}">
+                
+                <!-- Ultra Premium Minimalist Badges -->
+                <div class="product-badges-container">
+                  {% if product.sold_out %}
+                  <div class="product-badge soldout-badge">Sold Out</div>
+                  {% endif %}
+                  
+                  {% if product.is_unique %}
+                  <div class="product-badge unique-badge">Unique</div>
+                  {% endif %}
+                  
+                  {% if product.is_sale %}
+                  <div class="product-badge sale-badge">Sale</div>
+                  {% endif %}
+                </div>
+                
+                <div class="product-actions">
+                    <a href="{% url 'add_to_wishlist' product.id %}" class="action-btn wishlist-btn">
+                        <i class="bi bi-heart"></i>
+                    </a>
+                    <button class="action-btn quick-view-btn" data-product="{{ product.id }}">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="product-info">
+                <h4 class="product-name">{{ product.name }}</h4>
+                <div class="product-price">
+                    {% if product.is_sale %}
+                    <div class="price-group">
+                        <span class="price-old">${{ product.price }}</span>
+                        <span class="price-new">${{ product.sale_price }}</span>
+                        {% if product.sold_out %}
+                        <span class="price-separator">•</span>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <span class="price-current">${{ product.price }}</span>
+                    {% endif %}
+                </div>
+                <!-- Premium View Details CTA -->
+                <a href="{% url 'product' product.id %}" class="product-link">
+                    {% if product.sold_out %}
+                    View Details
+                    <i class="bi bi-arrow-right"></i>
+                    {% else %}
+                    Shop Now
+                    <i class="bi bi-arrow-right"></i>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-search empty-icon"></i>
+        <h4>No products found</h4>
+        <p>Check back soon for new arrivals</p>
+    </div>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+      <nav class="pagination">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}&cat_page={{ cat_page_obj.number }}" 
+           class="pagination-btn prev">
+          <i class="bi bi-chevron-left"></i>
+          Previous
+        </a>
+        {% endif %}
+
+        <div class="pagination-pages">
+          {% for num in page_obj.paginator.page_range %}
+            {% if num == page_obj.number %}
+            <span class="pagination-page active">{{ num }}</span>
+            {% else %}
+            <a href="?page={{ num }}&cat_page={{ cat_page_obj.number }}" 
+               class="pagination-page">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}&cat_page={{ cat_page_obj.number }}" 
+           class="pagination-btn next">
+          Next
+          <i class="bi bi-chevron-right"></i>
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ==================== PREMIUM VIDEO SECTION ==================== -->
+<!-- ==================== PREMIUM VIDEO SECTION ==================== -->
+<!-- ==================== PREMIUM VIDEO SECTION ==================== -->
+<section class="premium-video-section">
+  <div class="video-container">
+    <!-- Replace with your actual video file -->
+    <video class="background-video" autoplay muted loop playsinline preload="metadata">
+      <source src="/media/uploads/product/video.mp4" type="video/mp4">
+      <!-- Fallback image if video doesn't load -->
+      <img src="/media/uploads/product/logo.jpeg" alt="Leciselé Hat Craftsmanship">
+    </video>
+    
+    <div class="video-overlay"></div>
+    
+    <!-- PREMIUM VIDEO CONTROLS -->
+    <div class="video-controls-premium">
+      <!-- LEFT SIDE: Sound Toggle -->
+      <div class="control-group-left">
+        <button class="premium-video-btn sound-toggle-btn" id="soundToggleBtn" title="Toggle Sound">
+          <i class="bi bi-volume-mute sound-on"></i>
+          <i class="bi bi-volume-up sound-off"></i>
+        </button>
+      </div>
+      
+      <!-- RIGHT SIDE: Enlarge Button -->
+      <div class="control-group-right">
+        <button class="premium-video-btn enlarge-btn" id="enlargeBtn" title="Fullscreen">
+          <i class="bi bi-arrows-fullscreen"></i>
+        </button>
+      </div>
+    </div>
+    
+    <div class="video-content">
+      <div class="video-text-content">
+        <h2 class="video-title">Timeless Elegance</h2>
+
+        <div class="video-divider">
+          <div class="divider-line"></div>
+          <div class="divider-dot"></div>
+          <div class="divider-line"></div>
+        </div>
+        
+        <a href="{% url 'search' %}" class="video-cta-btn">
+          <span>Explore Collection</span>
+          <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CATEGORIES SECTION ==================== -->
+<section class="categories-section py-5">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="section-header">
+      <div class="header-content">
+        <h2 class="section-title">Shop by Category</h2>
+        <p class="section-subtitle">Explore our curated collections</p>
+        <div class="section-decoration">
+          <div class="decoration-line"></div>
+          <div class="decoration-dot"></div>
+          <div class="decoration-line"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="collections-grid">
+      {% for category in categories %}
+      <div class="collection-card">
+        <div class="collection-image">
+          <img loading="lazy" src="{{ category.image.url }}" alt="{{ category.name }}">
+          <div class="collection-overlay">
+            <a href="{% url 'category' category.name|slugify %}" class="collection-link">
+              Explore Collection
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+        <div class="collection-info">
+          <h4 class="collection-name">{{ category.name }}</h4>
+          <p class="collection-description">{{ category.description }}</p>
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty-state">
+        <i class="bi bi-collection empty-icon"></i>
+        <h4>No collections found</h4>
+        <p>Collections coming soon</p>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Premium Pagination for Categories -->
+    {% if cat_page_obj.has_other_pages %}
+    <div class="pagination-container">
+      <nav class="pagination">
+        {% if cat_page_obj.has_previous %}
+        <a href="?cat_page={{ cat_page_obj.previous_page_number }}&page={{ page_obj.number }}" 
+           class="pagination-btn prev">
+          <i class="bi bi-chevron-left"></i>
+          Previous
+        </a>
+        {% endif %}
+
+        <div class="pagination-pages">
+          {% for num in cat_page_obj.paginator.page_range %}
+            {% if num == cat_page_obj.number %}
+            <span class="pagination-page active">{{ num }}</span>
+            {% else %}
+            <a href="?cat_page={{ num }}&page={{ page_obj.number }}" 
+               class="pagination-page">{{ num }}</a>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        {% if cat_page_obj.has_next %}
+        <a href="?cat_page={{ cat_page_obj.next_page_number }}&page={{ page_obj.number }}" 
+           class="pagination-btn next">
+          Next
+          <i class="bi bi-chevron-right"></i>
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- ==================== BRAND STORY ==================== -->
+<section class="brand-story py-5">
+  <div class="container">
+    <div class="story-content">
+      <div class="story-text">
+        <h2 class="story-title">The Art of French Craftsmanship</h2>
+        <p class="story-description" >
+          Each Leciselé piece is meticulously handcrafted in France, blending traditional techniques 
+          with contemporary design. Our commitment to excellence ensures every product tells a story 
+          of heritage, quality, and timeless elegance.
+        </p>
+        
+      </div>
+      
+    </div>
+  </div>
+</section>
+<!-- ==================== PREMIUM ZOOM MODAL ==================== -->
+<div class="zoom-modal-premium" id="zoomModal">
+  <div class="zoom-modal-overlay-premium"></div>
+  <div class="zoom-modal-container-premium">
+    
+    <!-- Premium Header -->
+    <div class="zoom-header-premium">
+      <div class="header-content-premium">
+        <div class="product-info-premium">
+          <h3 class="product-name-premium" id="zoomProductName">Product Name</h3>
+          <div class="product-price-premium" id="zoomProductPrice">$0.00</div>
+        </div>
+        <div class="header-actions-premium">
+          <button class="premium-action-btn zoom-reset-mini" id="zoomResetMini" title="Reset Zoom">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <button class="premium-action-btn zoom-fullscreen-btn" id="zoomFullscreenBtn" title="Fullscreen">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+          <button class="premium-action-btn zoom-close-premium" id="zoomCloseBtn">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Premium Image Container -->
+    <div class="zoom-image-container-premium" id="zoomImageContainer">
+      <img id="zoomImage" src="" alt="Product Image" class="premium-zoom-image">
+      
+      <!-- Zoom Level Indicator -->
+      
+
+      <!-- Navigation Arrows (Desktop) -->
+      <button class="nav-arrow nav-prev" id="navPrev">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <button class="nav-arrow nav-next" id="navNext">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Premium Controls -->
+    <div class="zoom-controls-premium">
+      <div class="controls-group">
+        <button class="control-btn-premium zoom-out-premium" id="zoomOutBtn">
+          <i class="bi bi-dash-lg"></i>
+          <span class="control-label">Zoom Out</span>
+        </button>
+        
+        <button class="control-btn-premium primary zoom-reset-premium" id="zoomResetBtn">
+          <i class="bi bi-arrow-clockwise"></i>
+          <span class="control-label">Reset</span>
+        </button>
+        
+        <button class="control-btn-premium zoom-in-premium" id="zoomInBtn">
+          <i class="bi bi-plus-lg"></i>
+          <span class="control-label">Zoom In</span>
+        </button>
+      </div>
+      
+      <div class="action-group">
+        <a href="#" class="premium-cta-btn" id="viewDetailsBtn">
+          <span>View Product Details</span>
+          <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Mobile Gesture Hint -->
+    <div class="mobile-gesture-hint">
+      <div class="gesture-hint-content">
+        <div class="hint-item">
+          <div class="hint-icon">🔍</div>
+          <span>Pinch to zoom</span>
+        </div>
+        <div class="hint-item">
+          <div class="hint-icon">👆</div>
+          <span>Drag to explore</span>
+        </div>
+        <div class="hint-item">
+          <div class="hint-icon">💫</div>
+          <span>Double tap to reset</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</main>
+
+<script>
+// Smooth scroll for hero CTA
+document.addEventListener('DOMContentLoaded', function() {
+  const discoverBtn = document.querySelector('.hero-actions .btn-premium');
+  if (discoverBtn) {
+    discoverBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('products').scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    });
+  }
+
+  // Quick view functionality
+  const quickViewButtons = document.querySelectorAll('.quick-view-btn');
+  quickViewButtons.forEach(button => {
+    button.addEventListener('click', function() {
+      const productId = this.getAttribute('data-product');
+      // Implement quick view modal here
+      console.log('Quick view for product:', productId);
+    });
+  });
+
+  // Intersection Observer for animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = "1";
+        entry.target.style.transform = "translateY(0)";
+      }
+    });
+  }, observerOptions);
+
+  // Observe product cards for animation
+  document.querySelectorAll('.product-card').forEach((el, index) => {
+    el.style.opacity = "0";
+    el.style.transform = "translateY(20px)";
+    el.style.transition = `all 0.6s ease ${index * 0.1}s`;
+    observer.observe(el);
+  });
+
+  // Ultra Premium Badge Interactions
+  const badgeContainers = document.querySelectorAll('.product-badges-container');
+  badgeContainers.forEach((container, index) => {
+    const badges = container.querySelectorAll('.product-badge');
+    badges.forEach((badge, badgeIndex) => {
+      badge.style.animationDelay = `${(index * 0.1) + (badgeIndex * 0.2)}s`;
+    });
+  });
+
+  // Enhanced video loading with smooth transitions
+  const video = document.querySelector('.background-video');
+  const videoSection = document.querySelector('.premium-video-section');
+  
+  if (video) {
+    video.addEventListener('loadeddata', function() {
+      videoSection.style.opacity = '0';
+      videoSection.style.transition = 'opacity 1s ease';
+      
+      setTimeout(() => {
+        videoSection.style.opacity = '1';
+      }, 100);
+    });
+  }
+});
+// Premium Zoom Modal JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+  const zoomModal = document.getElementById('zoomModal');
+  const zoomImage = document.getElementById('zoomImage');
+  const zoomProductName = document.getElementById('zoomProductName');
+  const zoomProductPrice = document.getElementById('zoomProductPrice');
+  const zoomCloseBtn = document.getElementById('zoomCloseBtn');
+ 
+  const quickViewButtons = document.querySelectorAll('.quick-view-btn');
+  const imageContainer = document.getElementById('zoomImageContainer');
+  
+  // Controls
+  const zoomInBtn = document.getElementById('zoomInBtn');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const zoomResetBtn = document.getElementById('zoomResetBtn');
+  const zoomResetMini = document.getElementById('zoomResetMini');
+  const zoomFullscreenBtn = document.getElementById('zoomFullscreenBtn');
+  const viewDetailsBtn = document.getElementById('viewDetailsBtn');
+  const navPrev = document.getElementById('navPrev');
+  const navNext = document.getElementById('navNext');
+  
+  let currentScale = 1;
+  let isDragging = false;
+  let startX, startY, scrollLeft, scrollTop;
+  let lastTapTime = 0;
+  let productUrl = '#';
+  let currentProductIndex = 0;
+  let products = [];
+
+  // Initialize products array from page
+  function initProducts() {
+    products = Array.from(document.querySelectorAll('.product-card')).map(card => ({
+      image: card.querySelector('.product-image img').src,
+      name: card.querySelector('.product-name').textContent,
+      price: card.querySelector('.price-current, .price-new')?.textContent || '',
+      url: card.querySelector('.product-link').href
+    }));
+  }
+
+  // Open modal on quick view button click
+  quickViewButtons.forEach((button, index) => {
+    button.addEventListener('click', function() {
+      const productCard = this.closest('.product-card');
+      const productImage = productCard.querySelector('.product-image img');
+      const productName = productCard.querySelector('.product-name').textContent;
+      const productPriceElement = productCard.querySelector('.price-current, .price-new');
+      const productPrice = productPriceElement ? productPriceElement.textContent : '';
+      const productLink = productCard.querySelector('.product-link').href;
+      
+      initProducts();
+      currentProductIndex = index;
+      
+      loadProduct(currentProductIndex);
+      openModal();
+    });
+  });
+  
+  function loadProduct(index) {
+    const product = products[index];
+    zoomImage.src = product.image;
+    zoomImage.alt = product.name;
+    zoomProductName.textContent = product.name;
+    zoomProductPrice.textContent = product.price;
+    productUrl = product.url;
+    viewDetailsBtn.href = productUrl;
+    
+    resetZoom();
+  }
+  
+  function openModal() {
+    zoomModal.classList.add('active');
+    document.body.classList.add('zoom-modal-open');
+    document.body.style.overflow = 'hidden';
+    
+    // Show mobile gesture hint temporarily
+    if (window.innerWidth <= 768) {
+      const gestureHint = document.querySelector('.mobile-gesture-hint');
+      setTimeout(() => {
+        gestureHint.style.display = 'block';
+      }, 500);
+      
+      setTimeout(() => {
+        gestureHint.style.display = 'none';
+      }, 3000);
+    }
+  }
+  
+  // Close modal
+  zoomCloseBtn.addEventListener('click', closeModal);
+  zoomModal.addEventListener('click', function(e) {
+    if (e.target === zoomModal) {
+      closeModal();
+    }
+  });
+  
+  // Keyboard support
+  document.addEventListener('keydown', function(e) {
+    if (zoomModal.classList.contains('active')) {
+      switch(e.key) {
+        case 'Escape':
+          closeModal();
+          break;
+        case 'ArrowLeft':
+          navigateProducts(-1);
+          break;
+        case 'ArrowRight':
+          navigateProducts(1);
+          break;
+        case '+':
+        case '=':
+          e.preventDefault();
+          zoomIn();
+          break;
+        case '-':
+          e.preventDefault();
+          zoomOut();
+          break;
+        case '0':
+          e.preventDefault();
+          resetZoom();
+          break;
+        case 'f':
+        case 'F':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+      }
+    }
+  });
+  
+  // Navigation
+  navPrev.addEventListener('click', () => navigateProducts(-1));
+  navNext.addEventListener('click', () => navigateProducts(1));
+  
+  function navigateProducts(direction) {
+    currentProductIndex = (currentProductIndex + direction + products.length) % products.length;
+    loadProduct(currentProductIndex);
+  }
+  
+  // Zoom functionality
+  zoomInBtn.addEventListener('click', zoomIn);
+  zoomOutBtn.addEventListener('click', zoomOut);
+  zoomResetBtn.addEventListener('click', resetZoom);
+  zoomResetMini.addEventListener('click', resetZoom);
+  zoomFullscreenBtn.addEventListener('click', toggleFullscreen);
+  
+  
+  
+  function zoomIn() {
+    currentScale = Math.min(currentScale + 0.25, 5);
+    applyZoom();
+  }
+  
+  function zoomOut() {
+    currentScale = Math.max(currentScale - 0.25, 1);
+    applyZoom();
+  }
+  
+ 
+  
+  // Mouse wheel zoom
+  imageContainer.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    
+    if (e.deltaY < 0) {
+      zoomIn();
+    } else {
+      zoomOut();
+    }
+  });
+  
+  // Double tap to reset (mobile)
+  imageContainer.addEventListener('touchend', function(e) {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTapTime;
+    
+    if (tapLength < 300 && tapLength > 0) {
+      e.preventDefault();
+      resetZoom();
+    }
+    
+    lastTapTime = currentTime;
+  });
+  
+  // Touch gestures for mobile zoom
+  let initialDistance = null;
+  
+  imageContainer.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      initialDistance = getDistance(e.touches[0], e.touches[1]);
+    }
+  });
+  
+  imageContainer.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const currentDistance = getDistance(e.touches[0], e.touches[1]);
+      
+      if (initialDistance !== null) {
+        const scaleFactor = currentDistance / initialDistance;
+        currentScale = Math.min(Math.max(currentScale * scaleFactor, 1), 5);
+        applyZoom();
+        initialDistance = currentDistance;
+      }
+    }
+  });
+  
+  imageContainer.addEventListener('touchend', function() {
+    initialDistance = null;
+  });
+  
+  // Drag functionality
+  imageContainer.addEventListener('mousedown', startDrag);
+  imageContainer.addEventListener('touchstart', startDrag);
+  
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('touchmove', drag);
+  
+  document.addEventListener('mouseup', endDrag);
+  document.addEventListener('touchend', endDrag);
+  
+  function startDrag(e) {
+    if (currentScale > 1) {
+      isDragging = true;
+      imageContainer.classList.add('zoomed');
+      
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+      
+      startX = clientX - imageContainer.getBoundingClientRect().left;
+      startY = clientY - imageContainer.getBoundingClientRect().top;
+      scrollLeft = imageContainer.scrollLeft;
+      scrollTop = imageContainer.scrollTop;
+      
+      if (e.cancelable) e.preventDefault();
+    }
+  }
+  
+  function drag(e) {
+    if (!isDragging) return;
+    
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    
+    const x = clientX - imageContainer.getBoundingClientRect().left;
+    const y = clientY - imageContainer.getBoundingClientRect().top;
+    
+    const walkX = (x - startX) * 3;
+    const walkY = (y - startY) * 3;
+    
+    imageContainer.scrollLeft = scrollLeft - walkX;
+    imageContainer.scrollTop = scrollTop - walkY;
+    
+    if (e.cancelable) e.preventDefault();
+  }
+  
+  function endDrag() {
+    isDragging = false;
+    imageContainer.classList.remove('zoomed');
+  }
+  
+  function applyZoom() {
+  zoomImage.style.transform = `scale(${currentScale})`;
+  
+  // Enable/disable buttons
+  zoomOutBtn.disabled = currentScale <= 1;
+  zoomResetBtn.disabled = currentScale === 1;
+  zoomResetMini.disabled = currentScale === 1;
+  
+  // Update cursor
+  imageContainer.style.cursor = currentScale > 1 ? 'grab' : 'zoom-in';
+}
+  
+  function resetZoom() {
+    currentScale = 1;
+    applyZoom();
+    imageContainer.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth'
+    });
+  }
+  
+  function toggleFullscreen() {
+    zoomModal.classList.toggle('fullscreen');
+    
+    if (zoomModal.classList.contains('fullscreen')) {
+      zoomFullscreenBtn.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+      zoomFullscreenBtn.title = 'Exit Fullscreen';
+    } else {
+      zoomFullscreenBtn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+      zoomFullscreenBtn.title = 'Fullscreen';
+    }
+  }
+  
+  function closeModal() {
+    zoomModal.classList.remove('active', 'fullscreen');
+    document.body.classList.remove('zoom-modal-open');
+    document.body.style.overflow = '';
+    resetZoom();
+    
+    // Reset fullscreen button
+    zoomFullscreenBtn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+    zoomFullscreenBtn.title = 'Fullscreen';
+  }
+  
+  function getDistance(touch1, touch2) {
+    return Math.sqrt(
+      Math.pow(touch2.clientX - touch1.clientX, 2) +
+      Math.pow(touch2.clientY - touch1.clientY, 2)
+    );
+  }
+  
+  // Prevent elastic scroll on iOS
+  document.addEventListener('touchmove', function(e) {
+    if (zoomModal.classList.contains('active')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+});
+// Premium Video Controls
+document.addEventListener('DOMContentLoaded', function() {
+  const videoSection = document.querySelector('.premium-video-section');
+  const video = document.querySelector('.background-video');
+  const soundToggleBtn = document.getElementById('soundToggleBtn');
+  const enlargeBtn = document.getElementById('enlargeBtn');
+  
+  if (video && soundToggleBtn && enlargeBtn) {
+    // Sound toggle functionality
+    soundToggleBtn.addEventListener('click', function() {
+      video.muted = !video.muted;
+      soundToggleBtn.classList.toggle('muted', !video.muted);
+      
+      // Update tooltip
+      if (video.muted) {
+        soundToggleBtn.title = 'Unmute Video';
+      } else {
+        soundToggleBtn.title = 'Mute Video';
+      }
+    });
+    
+    // Fullscreen functionality
+    enlargeBtn.addEventListener('click', function() {
+      if (!document.fullscreenElement) {
+        // Enter fullscreen
+        if (videoSection.requestFullscreen) {
+          videoSection.requestFullscreen();
+        } else if (videoSection.webkitRequestFullscreen) {
+          videoSection.webkitRequestFullscreen();
+        } else if (videoSection.msRequestFullscreen) {
+          videoSection.msRequestFullscreen();
+        }
+        
+        videoSection.classList.add('fullscreen');
+        enlargeBtn.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+        enlargeBtn.title = 'Exit Fullscreen';
+      } else {
+        // Exit fullscreen
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+        
+        videoSection.classList.remove('fullscreen');
+        enlargeBtn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+        enlargeBtn.title = 'Fullscreen';
+      }
+    });
+    
+    // Handle fullscreen change events
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('msfullscreenchange', handleFullscreenChange);
+    
+    function handleFullscreenChange() {
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+        videoSection.classList.remove('fullscreen');
+        enlargeBtn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+        enlargeBtn.title = 'Fullscreen';
+      }
+    }
+    
+    // Auto-hide controls after interaction (optional)
+    let controlsTimeout;
+    const videoControls = document.querySelector('.video-controls-premium');
+    
+    function showControls() {
+      videoControls.style.opacity = '1';
+      clearTimeout(controlsTimeout);
+      controlsTimeout = setTimeout(() => {
+        videoControls.style.opacity = '0';
+      }, 3000);
+    }
+    
+    // Show controls on mouse move or touch
+    videoSection.addEventListener('mousemove', showControls);
+    videoSection.addEventListener('touchstart', showControls);
+    
+    // Initial show then hide
+    showControls();
+  }
+});
+</script>
+
+{% endblock %}

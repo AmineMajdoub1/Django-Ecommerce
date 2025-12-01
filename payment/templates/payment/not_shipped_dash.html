@@ -1,0 +1,815 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- ==================== PREMIUM NOT SHIPPED HEADER ==================== -->
+<header class="premium-hero-section">
+  <div class="hero-background">
+    <div class="background-elements">
+      <div class="floating-element el-1"></div>
+      <div class="floating-element el-2"></div>
+      <div class="floating-element el-3"></div>
+      <div class="floating-element el-4"></div>
+    </div>
+    <div class="gradient-overlay"></div>
+  </div>
+  
+  <div class="container">
+    <div class="hero-content">
+      <div class="brand-presentation">
+        <div class="logo-glow"></div>
+        <h1 class="brand-title">
+          <span class="title-main">Order Management</span>
+          <span class="title-subtitle">UN-SHIPPED ORDERS</span>
+        </h1>
+        <div class="hero-divider">
+          <div class="divider-line"></div>
+          <div class="divider-dot"></div>
+          <div class="divider-line"></div>
+        </div>
+        <p class="hero-tagline">Manage and track pending shipments with precision</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ==================== PREMIUM ORDERS SECTION ==================== -->
+<section class="premium-orders-section py-6">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-xxl-10 col-xl-11 col-lg-12">
+        
+        <!-- Premium Orders Card -->
+        <div class="premium-card orders-card fade-in-up">
+          <div class="card-header lecisele-header">
+            <div class="header-content">
+              <i class="bi bi-truck-flatbed header-icon"></i>
+              <div class="header-text">
+                <h3 class="card-title">Un-Shipped Orders</h3>
+                <p class="card-subtitle">Pending shipments requiring attention</p>
+              </div>
+            </div>
+            <div class="header-badge">
+              <span class="orders-count">{{ orders|length }}</span>
+              <span class="badge-label">Orders</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            {% if orders %}
+            <!-- Premium Orders Table -->
+            <div class="table-container">
+              <div class="table-responsive">
+                <table class="premium-table">
+                  <thead>
+                    <tr>
+                      <th class="order-col">
+                        <i class="bi bi-hash"></i>
+                        Order #
+                      </th>
+                      <th class="price-col">
+                        <i class="bi bi-currency-dollar"></i>
+                        Amount
+                      </th>
+                      <th class="email-col">
+                        <i class="bi bi-envelope"></i>
+                        Email
+                      </th>
+                      <th class="date-col">
+                        <i class="bi bi-calendar"></i>
+                        Date Ordered
+                      </th>
+                      <th class="action-col">
+                        <i class="bi bi-gear"></i>
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in orders %}
+                    <tr class="order-row fade-in-up">
+                      <td class="order-id" data-label="Order #">
+                        <a href="{% url 'orders' item.id %}" class="order-link">
+                          #{{ item.id }}
+                          <i class="bi bi-box-arrow-up-right link-icon"></i>
+                        </a>
+                      </td>
+                      <td class="order-price" data-label="Amount">
+                        <span class="price-amount">${{ item.amount_paid }}</span>
+                      </td>
+                      <td class="order-email" data-label="Email">
+                        <span class="email-text">{{ item.email }}</span>
+                      </td>
+                      <td class="order-date" data-label="Date Ordered">
+                        <span class="date-text">{{ item.date_ordered }}</span>
+                      </td>
+                      <td class="order-actions" data-label="Actions">
+                        <form method="POST" class="shipment-form">
+                          {% csrf_token %}
+                          <input type="hidden" name="shipping_status" value="true">
+                          <input type="hidden" name="num" value="{{ item.id }}">
+                          <button type="submit" class="btn-ship-premium">
+                            <i class="bi bi-check-circle"></i>
+                            Mark Shipped
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-orders-state">
+              <div class="empty-icon">
+                <i class="bi bi-check2-all"></i>
+              </div>
+              <h4 class="empty-title">All Orders Shipped</h4>
+              <p class="empty-description">All orders have been processed and shipped successfully.</p>
+              <div class="empty-actions">
+                <!-- Updated: Removed dashboard link and added home link -->
+                <a href="{% url 'home' %}" class="btn-premium">
+                  <i class="bi bi-arrow-left"></i>
+                  Return to Home
+                </a>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+
+          <!-- Card Footer -->
+          <div class="card-footer">
+            <div class="footer-content">
+              <div class="update-info">
+                <i class="bi bi-clock-history"></i>
+              </div>
+              <div class="order-stats">
+                <span class="stat-item">
+                  <i class="bi bi-inbox"></i>
+                  {{ orders|length }} pending
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+/* ==================== PREMIUM ORDERS SECTION STYLES ==================== */
+.premium-orders-section {
+  background: var(--bg-dark);
+  min-height: 60vh;
+}
+
+/* Orders Card */
+.orders-card {
+  background: var(--bg-card);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--border-dark);
+}
+
+/* Card Header */
+.lecisele-header {
+  background: linear-gradient(135deg, 
+    rgba(26, 26, 26, 0.95) 0%,
+    rgba(30, 30, 30, 0.9) 100%);
+  padding: 2rem;
+  border-bottom: 1px solid var(--border-dark);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(20px);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-icon {
+  font-size: 2.5rem;
+  color: var(--gold-primary);
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-text {
+  flex: 1;
+}
+
+.card-title {
+  font-family: 'Unica One', cursive;
+  font-size: 2rem;
+  color: var(--text-on-dark);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: 1px;
+}
+
+.card-subtitle {
+  color: var(--text-muted-dark);
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 400;
+}
+
+.header-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(198, 166, 100, 0.1);
+  border: 1px solid rgba(198, 166, 100, 0.3);
+  border-radius: 16px;
+  padding: 1rem 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.orders-count {
+  font-family: 'Unica One', cursive;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--gold-primary);
+  line-height: 1;
+}
+
+.badge-label {
+  color: var(--text-muted-dark);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Table Container */
+.table-container {
+  padding: 0;
+}
+
+.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+}
+
+.premium-table thead {
+  background: linear-gradient(135deg, 
+    rgba(20, 20, 20, 0.95) 0%,
+    rgba(25, 25, 25, 0.9) 100%);
+  border-bottom: 2px solid var(--border-dark);
+}
+
+.premium-table th {
+  padding: 1.5rem 1rem;
+  color: var(--text-on-dark);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+  text-align: left;
+}
+
+.premium-table th i {
+  color: var(--gold-primary);
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+/* Table Columns */
+.order-col { width: 15%; }
+.price-col { width: 15%; }
+.email-col { width: 25%; }
+.date-col { width: 20%; }
+.action-col { width: 25%; }
+
+/* Table Rows */
+.order-row {
+  border-bottom: 1px solid var(--border-dark);
+  transition: all 0.3s ease;
+  background: var(--bg-card);
+}
+
+.order-row:hover {
+  background: var(--bg-card-hover);
+  transform: translateX(5px);
+}
+
+.order-row td {
+  padding: 1.5rem 1rem;
+  border: none;
+  vertical-align: middle;
+}
+
+/* Order ID */
+.order-id .order-link {
+  color: var(--text-on-dark);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  font-family: 'Unica One', cursive;
+  letter-spacing: 0.5px;
+}
+
+.order-id .order-link:hover {
+  color: var(--gold-primary);
+}
+
+.link-icon {
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.order-link:hover .link-icon {
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+/* Order Price */
+.price-amount {
+  color: var(--gold-primary);
+  font-weight: 700;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Order Email */
+.email-text {
+  color: var(--text-on-dark);
+  font-weight: 500;
+}
+
+/* Order Date */
+.date-text {
+  color: var(--text-muted-dark);
+  font-weight: 500;
+}
+
+/* Shipment Form */
+.shipment-form {
+  margin: 0;
+}
+
+.btn-ship-premium {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  border: none;
+  border-radius: 12px;
+  color: var(--text-dark);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-ship-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s ease;
+}
+
+.btn-ship-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(198, 166, 100, 0.3);
+}
+
+.btn-ship-premium:hover::before {
+  left: 100%;
+}
+
+/* Empty State */
+.empty-orders-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-muted-dark);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: var(--gold-primary);
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+}
+
+.empty-title {
+  color: var(--text-on-dark);
+  font-family: 'Unica One', cursive;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.empty-description {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.empty-actions {
+  margin-top: 2rem;
+}
+
+/* Card Footer */
+.card-footer {
+  background: linear-gradient(135deg, 
+    rgba(20, 20, 20, 0.95) 0%,
+    rgba(25, 25, 25, 0.9) 100%);
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--border-dark);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted-dark);
+  font-size: 0.9rem;
+}
+
+.update-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.update-info i {
+  color: var(--gold-primary);
+}
+
+.order-stats {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stat-item i {
+  color: var(--gold-primary);
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .lecisele-header {
+    padding: 1.5rem;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  
+  .header-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .header-badge {
+    flex-direction: row;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  
+  .orders-count {
+    font-size: 2rem;
+  }
+  
+  .premium-table th,
+  .premium-table td {
+    padding: 1.25rem 0.75rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .premium-orders-section {
+    padding: 2rem 0;
+  }
+  
+  .card-title {
+    font-size: 1.5rem;
+  }
+  
+  .orders-count {
+    font-size: 1.8rem;
+  }
+  
+  .premium-table thead {
+    display: none;
+  }
+  
+  .premium-table tbody tr {
+    display: block;
+    margin-bottom: 1.5rem;
+    background: var(--bg-card);
+    border-radius: 12px;
+    border: 1px solid var(--border-dark);
+    padding: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .premium-table tbody tr:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  }
+  
+  .premium-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0.5rem;
+    border-bottom: 1px solid var(--border-dark);
+    text-align: right;
+  }
+  
+  .premium-table tbody td:last-child {
+    border-bottom: none;
+    justify-content: center;
+    padding-top: 1.5rem;
+  }
+  
+  .premium-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--text-muted-dark);
+    text-align: left;
+    flex: 1;
+    font-size: 0.9rem;
+  }
+  
+  .order-id .order-link {
+    justify-content: space-between;
+    width: 100%;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .order-stats {
+    justify-content: center;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .lecisele-header {
+    padding: 1.25rem;
+  }
+  
+  .header-icon {
+    font-size: 2rem;
+  }
+  
+  .card-title {
+    font-size: 1.3rem;
+  }
+  
+  .header-badge {
+    padding: 0.75rem 1rem;
+  }
+  
+  .orders-count {
+    font-size: 1.5rem;
+  }
+  
+  .premium-table tbody tr {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .premium-table tbody td {
+    padding: 0.75rem 0.25rem;
+    font-size: 0.9rem;
+  }
+  
+  .btn-ship-premium {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.85rem;
+  }
+  
+  .empty-orders-state {
+    padding: 3rem 1rem;
+  }
+  
+  .empty-title {
+    font-size: 1.5rem;
+  }
+  
+  .empty-description {
+    font-size: 1rem;
+  }
+}
+
+/* ==================== ANIMATIONS ==================== */
+.fade-in-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.order-row {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.order-row:nth-child(1) { animation-delay: 0.1s; }
+.order-row:nth-child(2) { animation-delay: 0.2s; }
+.order-row:nth-child(3) { animation-delay: 0.3s; }
+.order-row:nth-child(4) { animation-delay: 0.4s; }
+.order-row:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==================== ENHANCED INTERACTIONS ==================== */
+.btn-ship-premium:active {
+  transform: translateY(0);
+}
+
+.order-link:focus,
+.btn-ship-premium:focus {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+/* Loading state for shipment button */
+.btn-ship-premium.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.btn-ship-premium.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--text-dark);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Success state */
+.btn-ship-premium.success {
+  background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.btn-ship-premium.success:hover {
+  box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+}
+</style>
+
+<script>
+// Enhanced interactions for the orders page
+document.addEventListener('DOMContentLoaded', function() {
+  // Add loading states to shipment buttons
+  const shipmentForms = document.querySelectorAll('.shipment-form');
+  
+  shipmentForms.forEach(form => {
+    form.addEventListener('submit', function(e) {
+      const button = this.querySelector('.btn-ship-premium');
+      const originalText = button.innerHTML;
+      
+      // Add loading state
+      button.classList.add('loading');
+      button.innerHTML = '<i class="bi bi-arrow-repeat"></i>Processing...';
+      button.disabled = true;
+      
+      // Simulate processing time for better UX
+      setTimeout(() => {
+        button.classList.remove('loading');
+        button.classList.add('success');
+        button.innerHTML = '<i class="bi bi-check-circle"></i>Shipped!';
+        
+        // Remove success state after delay
+        setTimeout(() => {
+          button.classList.remove('success');
+          button.innerHTML = originalText;
+          button.disabled = false;
+        }, 2000);
+      }, 1500);
+    });
+  });
+  
+  // Add hover effects to table rows
+  const tableRows = document.querySelectorAll('.order-row');
+  
+  tableRows.forEach(row => {
+    row.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateX(8px)';
+    });
+    
+    row.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateX(0)';
+    });
+  });
+  
+  // Add floating elements to orders section
+  const ordersSection = document.querySelector('.premium-orders-section');
+  if (ordersSection) {
+    const floatingContainer = document.createElement('div');
+    floatingContainer.className = 'floating-elements';
+    floatingContainer.innerHTML = `
+      <div class="floating-element" style="width: 120px; height: 120px; top: 10%; right: -25px; animation-delay: 0s;"></div>
+      <div class="floating-element" style="width: 80px; height: 80px; bottom: 20%; left: -15px; animation-delay: 2s;"></div>
+      <div class="floating-element" style="width: 60px; height: 60px; top: 60%; right: 15%; animation-delay: 4s;"></div>
+    `;
+    ordersSection.appendChild(floatingContainer);
+  }
+  
+  // Add intersection observer for animations
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, observerOptions);
+  
+  // Observe elements with fade-in-up class
+  document.querySelectorAll('.fade-in-up').forEach(el => {
+    observer.observe(el);
+  });
+});
+
+// Real-time order count update (if using WebSockets or similar)
+function updateOrderCount(newCount) {
+  const countElement = document.querySelector('.orders-count');
+  if (countElement) {
+    countElement.textContent = newCount;
+    
+    // Add animation for count change
+    countElement.style.transform = 'scale(1.2)';
+    setTimeout(() => {
+      countElement.style.transform = 'scale(1)';
+    }, 300);
+  }
+}
+
+// Keyboard navigation support - updated to use home URL
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    // Close any open modals or return to home
+    window.location.href = "{% url 'home' %}";
+  }
+});
+</script>
+
+{% endblock %}

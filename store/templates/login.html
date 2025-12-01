@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+{% load static %}
+
+{% block content %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+<!-- Premium Login Section -->
+<section class="premium-login-section py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <!-- Premium Login Header -->
+                <header class="premium-login-header text-center mb-5">
+                    <div class="login-brand-presentation">
+                        <div class="login-logo-container">
+                            <img src="/media/uploads/product/lo.png" alt="Leciselé" class="login-logo">
+                        </div>
+                        <div class="login-divider">
+                            <div class="divider-line"></div>
+                            <div class="divider-dot"></div>
+                            <div class="divider-line"></div>
+                        </div>
+                        <h1 class="login-title">Welcome Back</h1>
+                        <p class="login-subtitle">Sign in to your Leciselé account</p>
+                    </div>
+                </header>
+
+                <!-- Premium Login Card -->
+                <div class="premium-login-card">
+                    <form method="POST" action="{% url 'login' %}">
+                        {% csrf_token %}
+                        
+                        <!-- Username Field -->
+                        <div class="form-group-premium mb-4">
+                            <div class="input-container">
+                                <i class="bi bi-person input-icon"></i>
+                                <input type="text" class="premium-input" name="username" placeholder="Enter Your Username" required>
+                            </div>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="form-group-premium mb-4">
+                            <div class="input-container">
+                                <i class="bi bi-lock input-icon"></i>
+                                <input type="password" class="premium-input" name="password" placeholder="Enter Your Password" required>
+                            </div>
+                        </div>
+
+                        <!-- Login Button -->
+                        <div class="d-grid mb-4">
+                            <button type="submit" class="btn-premium login-submit-btn">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                <span>Sign In</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="login-divider-section">
+                        <div class="divider-line"></div>
+                        <span class="divider-text">or continue with</span>
+                        <div class="divider-line"></div>
+                    </div>
+
+                    <!-- Google Login -->
+                    <div class="d-grid mb-4">
+                        <a href="{% provider_login_url 'google' %}" class="btn-premium-outline google-login-btn">
+                            <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg" alt="Google" class="google-icon">
+                            <span>Sign in with Google</span>
+                        </a>
+                    </div>
+
+                    <!-- Registration Link -->
+                    <div class="text-center">
+                        <p class="register-link">
+                            Don't have an account? 
+                            <a href="{% url 'register' %}" class="register-cta">
+                                Create Account <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

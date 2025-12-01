@@ -1,0 +1,620 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    /* Premium Shipping Policy Dark Theme */
+    .premium-policy-hero-section {
+        position: relative;
+        min-height: 40vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, 
+            rgba(15, 15, 15, 0.95) 0%,
+            rgba(10, 10, 10, 0.98) 50%,
+            rgba(30, 30, 30, 0.95) 100%);
+        overflow: hidden;
+        padding: 4rem 0 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .hero-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+    }
+
+    .background-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .floating-element {
+        position: absolute;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--gold-primary), transparent);
+        opacity: 0.08;
+        animation: floatElement 8s ease-in-out infinite;
+    }
+
+    .el-1 {
+        width: 250px;
+        height: 250px;
+        top: -120px;
+        right: -80px;
+        animation-delay: 0s;
+    }
+
+    .el-2 {
+        width: 180px;
+        height: 180px;
+        bottom: 80px;
+        left: -40px;
+        animation-delay: 2s;
+    }
+
+    .el-3 {
+        width: 120px;
+        height: 120px;
+        top: 35%;
+        right: 15%;
+        animation-delay: 4s;
+    }
+
+    .el-4 {
+        width: 90px;
+        height: 90px;
+        bottom: 120px;
+        right: 12%;
+        animation-delay: 6s;
+    }
+
+    .gradient-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 25% 75%, rgba(198, 166, 100, 0.12) 0%, transparent 50%),
+            radial-gradient(circle at 75% 25%, rgba(214, 198, 177, 0.08) 0%, transparent 50%);
+    }
+
+    @keyframes floatElement {
+        0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+        33% { transform: translateY(-15px) rotate(120deg) scale(1.05); }
+        66% { transform: translateY(8px) rotate(240deg) scale(0.95); }
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .policy-title {
+        font-family: 'Unica One', cursive;
+        font-size: 3rem;
+        color: var(--text-on-dark);
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--text-on-dark) 0%, var(--gold-primary) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+    }
+
+    .policy-subtitle {
+        color: var(--text-muted-dark);
+        font-size: 1.2rem;
+        line-height: 1.6;
+        font-weight: 300;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .premium-policy-section {
+        background: var(--bg-card);
+        border-radius: 20px;
+        padding: 3rem;
+        margin-bottom: 2.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border-dark);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .premium-policy-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(198, 166, 100, 0.03) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .premium-policy-section:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(198, 166, 100, 0.2);
+        background: var(--bg-card-hover);
+    }
+
+    .premium-policy-section:hover::before {
+        opacity: 1;
+    }
+
+    .section-title {
+        font-family: 'Unica One', cursive;
+        font-size: 1.8rem;
+        color: var(--text-on-dark);
+        margin-bottom: 2rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 2px;
+        background: linear-gradient(90deg, var(--gold-primary), transparent);
+    }
+
+    .policy-content {
+        line-height: 1.7;
+        font-size: 1.05rem;
+        color: var(--text-on-dark);
+    }
+
+    .policy-content p {
+        margin-bottom: 1.5rem;
+        color: var(--text-on-dark);
+    }
+
+    .highlight-box {
+        background: rgba(198, 166, 100, 0.1);
+        border-left: 4px solid var(--gold-primary);
+        padding: 2rem;
+        margin: 2rem 0;
+        border-radius: 0 12px 12px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .highlight-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .highlight-box:hover::before {
+        left: 100%;
+    }
+
+    .policy-list {
+        list-style-type: none;
+        padding-left: 0;
+        margin: 1.5rem 0;
+    }
+
+    .policy-list li {
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+        position: relative;
+        color: var(--text-on-dark);
+    }
+
+    .policy-list li:before {
+        content: '▸';
+        color: var(--gold-primary);
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+        font-size: 1.2rem;
+    }
+
+    .icon-box {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .icon-box:hover {
+        background: rgba(198, 166, 100, 0.05);
+        border-color: rgba(198, 166, 100, 0.2);
+        transform: translateX(5px);
+    }
+
+    .icon-box i {
+        font-size: 1.5rem;
+        color: var(--gold-primary);
+        margin-right: 1.5rem;
+        width: 30px;
+        flex-shrink: 0;
+        margin-top: 0.2rem;
+    }
+
+    .icon-box strong {
+        color: var(--gold-light);
+        font-weight: 600;
+    }
+
+    .premium-contact-info {
+        background: linear-gradient(135deg, rgba(198, 166, 100, 0.1), rgba(214, 198, 177, 0.05));
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        margin-top: 3rem;
+        border: 1px solid var(--border-dark);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .premium-contact-info::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: 
+            radial-gradient(circle at 20% 80%, rgba(198, 166, 100, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(214, 198, 177, 0.04) 0%, transparent 50%);
+    }
+
+    .contact-title {
+        font-family: 'Unica One', cursive;
+        font-size: 1.8rem;
+        color: var(--text-on-dark);
+        margin-bottom: 1rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        position: relative;
+        z-index: 2;
+    }
+
+    .contact-email {
+        font-size: 1.3rem;
+        color: var(--gold-primary);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .contact-email:hover {
+        color: var(--gold-light);
+        transform: translateY(-2px);
+    }
+
+    .contact-email::before {
+        content: '✉';
+        font-size: 1.1rem;
+    }
+
+    /* Animation for sections */
+    .fade-in-up {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: all 0.6s ease;
+    }
+
+    .fade-in-up.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .premium-policy-section {
+            padding: 2rem 1.5rem;
+        }
+        
+        .policy-title {
+            font-size: 2.2rem;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+        }
+        
+        .premium-contact-info {
+            padding: 2rem 1.5rem;
+        }
+        
+        .icon-box {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .icon-box i {
+            margin-right: 0;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .policy-title {
+            font-size: 1.8rem;
+            letter-spacing: 0.1em;
+        }
+        
+        .policy-subtitle {
+            font-size: 1rem;
+        }
+        
+        .premium-policy-section {
+            padding: 1.5rem;
+        }
+        
+        .contact-email {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+
+<!-- Premium Hero Section -->
+<section class="premium-policy-hero-section">
+    <div class="hero-background">
+        <div class="background-elements">
+            <div class="floating-element el-1"></div>
+            <div class="floating-element el-2"></div>
+            <div class="floating-element el-3"></div>
+            <div class="floating-element el-4"></div>
+        </div>
+        <div class="gradient-overlay"></div>
+    </div>
+    
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="policy-title">Shipping Policy</h1>
+            <p class="policy-subtitle">Every order is handled with care. Our hats and goods are crafted and packaged to travel safely worldwide.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Policy Content -->
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Overview Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Overview</h2>
+                <div class="policy-content">
+                    <p>This page explains how we ship, typical timelines, and who is responsible for what at each step.</p>
+                </div>
+            </div>
+
+            <!-- Processing Times Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Processing Times</h2>
+                <div class="policy-content">
+                    <div class="icon-box">
+                        <i class="bi bi-clock"></i>
+                        <div>
+                            <strong>Made-to-Measure Hats:</strong> generally 1–2 weeks.
+                        </div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="bi bi-brush"></i>
+                        <div>
+                            <strong>Custom Hats:</strong> generally 2–3 weeks, with additional time if artwork is involved or if materials are pending. Timelines may also depend on client responsiveness when booking/attending consultations.
+                        </div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="bi bi-box-seam"></i>
+                        <div>
+                            <strong>Hats Collections:</strong> typically ship within 3–5 business days.
+                        </div>
+                    </div>
+                    <div class="highlight-box">
+                        <p>If we anticipate exceeding the quoted timeframe (e.g., high order volume, material delays), we will notify you.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carriers & Delivery Options Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Carriers & Delivery Options</h2>
+                <div class="policy-content">
+                    <div class="icon-box">
+                        <i class="bi bi-truck"></i>
+                        <div>
+                            We ship via UPS, DHL, and Canada Post.
+                        </div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="bi bi-pen"></i>
+                        <div>
+                            <strong>Signature:</strong> not required by default; available upon request before shipment.
+                        </div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="bi bi-geo-alt"></i>
+                        <div>
+                            <strong>PO Boxes / Remote Areas:</strong> Certain services may be limited; we will advise alternatives if needed.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Rates Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Shipping Rates</h2>
+                <div class="policy-content">
+                    <p>Shipping costs are not calculated at checkout and are based on destination, weight/volume, and service.</p>
+                    <p>On request (before purchase), we may be able to quote alternate rates via our carriers.</p>
+                </div>
+            </div>
+
+            <!-- Taxes, Duties, and Import Fees Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Taxes, Duties, and Import Fees</h2>
+                <div class="policy-content">
+                    <p>International shipments may be subject to taxes, duties, tariffs, or VAT set by the destination country. These charges are not included in our prices or shipping fees and are the client's responsibility. We do not control these costs or their timing.</p>
+                </div>
+            </div>
+
+            <!-- Insurance Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Insurance</h2>
+                <div class="policy-content">
+                    <p>All parcels are insured for $100 by default.</p>
+                    <p>Additional insurance can be added upon request prior to shipment; we will quote the cost on request.</p>
+                </div>
+            </div>
+
+            <!-- Packaging Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Packaging</h2>
+                <div class="policy-content">
+                    <div class="icon-box">
+                        <i class="bi bi-box"></i>
+                        <div>
+                            <strong>Hats:</strong> shipped in a rigid hat box, secured within a corrugated outer carton for protection.
+                        </div>
+                    </div>
+                    <div class="icon-box">
+                        <i class="bi bi-bag"></i>
+                        <div>
+                            <strong>Leather goods & oddities:</strong> shipped in padded mailers or bubble-protected envelopes, as appropriate.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Address Accuracy, Edits & Cut-Off Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Address Accuracy, Edits & Cut-Off</h2>
+                <div class="policy-content">
+                    <p>Please confirm your shipping address is complete and accurate at checkout.</p>
+                    <p>Address changes are possible only before an order is handed to the carrier; contact us immediately with your order number.</p>
+                </div>
+            </div>
+
+            <!-- Undeliverable or Returned Shipments Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Undeliverable or Returned Shipments</h2>
+                <div class="policy-content">
+                    <p>If a parcel returns to us due to any of the following:</p>
+                    <ul class="policy-list">
+                        <li>incorrect/incomplete address</li>
+                        <li>refusal of delivery</li>
+                        <li>failure to collect from the carrier, or</li>
+                        <li>non-payment of duties/taxes</li>
+                    </ul>
+                    <p>the client is responsible for:</p>
+                    <ul class="policy-list">
+                        <li>the original shipping charges</li>
+                        <li>any carrier return fees billed to us, and</li>
+                        <li>re-shipment costs if you request the parcel be sent again</li>
+                    </ul>
+                    <div class="highlight-box">
+                        <p>If you do not request re-shipment, a refund may be issued for eligible Hats items only per our Refund & Return Policy, less all shipping/return fees. Custom and Made-to-Measure items remain final sale.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delays, Risk & Responsibility Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Delays, Risk & Responsibility</h2>
+                <div class="policy-content">
+                    <p>Once a parcel is accepted by the carrier (first scan), risk of loss or delay transfers to the client.</p>
+                    <p>We are not responsible for delays caused by carriers, customs processing, weather, or other events beyond our control.</p>
+                    <p>We provide tracking details as proof of shipment and will assist with carrier inquiries where possible.</p>
+                </div>
+            </div>
+
+            <!-- Order Status & Support Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Order Status & Support</h2>
+                <div class="policy-content">
+                    <p>For delivery updates, special shipping requests (signature, insurance, alternate quotes), or any issues with your shipment, contact us with your order number.</p>
+                </div>
+            </div>
+
+            <!-- Returns & Exchanges Section -->
+            <div class="premium-policy-section fade-in-up">
+                <h2 class="section-title">Returns & Exchanges</h2>
+                <div class="policy-content">
+                    <p>For returns and exchanges, please review our Refund & Return Policy. It includes eligibility requirements, timelines, and the process to request authorization.</p>
+                </div>
+            </div>
+
+            <!-- Premium Contact Information -->
+            <div class="premium-contact-info fade-in-up">
+                <h3 class="contact-title">Need Assistance?</h3>
+                <p class="policy-content" style="margin-bottom: 1.5rem;">Contact our customer service team for any shipping inquiries</p>
+                <a href="mailto:info@lecisele.com" class="contact-email">info@lecisele.com</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add floating elements dynamically
+    document.addEventListener('DOMContentLoaded', function() {
+        const heroSection = document.querySelector('.premium-policy-hero-section');
+        if (heroSection) {
+            const floatingContainer = document.createElement('div');
+            floatingContainer.className = 'floating-elements';
+            floatingContainer.innerHTML = `
+                <div class="floating-element" style="width: 200px; height: 200px; top: 10%; right: -50px; animation-delay: 0s;"></div>
+                <div class="floating-element" style="width: 150px; height: 150px; bottom: 20%; left: -30px; animation-delay: 2s;"></div>
+                <div class="floating-element" style="width: 100px; height: 100px; top: 40%; right: 15%; animation-delay: 4s;"></div>
+            `;
+            heroSection.appendChild(floatingContainer);
+        }
+
+        // Animation observer
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements with fade-in-up class
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+    });
+</script>
+
+{% endblock %}

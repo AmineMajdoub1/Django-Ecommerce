@@ -1,0 +1,1550 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Add CSS link in the head section -->
+<link rel="stylesheet" href="{% static 'css/product.css' %}">
+
+<div class="product-page-container">
+  <!-- Breadcrumb Navigation - Dark Theme -->
+  <nav class="breadcrumb-nav">
+    <div class="container">
+      <a href="{% url 'home' %}" class="breadcrumb-link">Home</a>
+      <span class="breadcrumb-separator">/</span>
+      <a href="{% url 'category' product.category.name|slugify %}" class="breadcrumb-link">{{ product.category.name }}</a>
+      <span class="breadcrumb-separator">/</span>
+      <span class="breadcrumb-current">{{ product.name }}</span>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <div class="product-main">
+      <!-- Product Gallery -->
+      <div class="product-gallery">
+        <div class="gallery-main">
+          <div class="main-image-container {% if product.sold_out %}sold-out-overlay{% endif %}">
+            <img src="{{ product.image.url }}" 
+                 class="gallery-main-image" 
+                 id="main-product-img" 
+                 alt="{{ product.name }}"
+                 loading="eager">
+            
+            <!-- ==================== ULTRA PREMIUM MINIMALIST BADGES ==================== -->
+            <div class="product-badges-container">
+              {% if product.sold_out %}
+              <div class="product-badge soldout-badge">Sold Out</div>
+              {% endif %}
+              
+              {% if product.is_unique %}
+              <div class="product-badge unique-badge">Unique</div>
+              {% endif %}
+              
+              {% if product.is_sale %}
+              <div class="product-badge sale-badge">Sale</div>
+              {% endif %}
+            </div>
+            
+            <button class="gallery-zoom-btn" onclick="openZoomModal()">
+              <i class="bi bi-zoom-in"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Thumbnail Gallery -->
+        {% if product.extra_image1 or product.extra_image2 %}
+        <div class="gallery-thumbnails">
+          <div class="thumbnail-scroll">
+            <div class="thumbnail active" data-image="{{ product.image.url }}">
+              <img src="{{ product.image.url }}" alt="Main Image">
+            </div>
+            {% if product.extra_image1 %}
+            <div class="thumbnail" data-image="{{ product.extra_image1.url }}">
+              <img src="{{ product.extra_image1.url }}" alt="Extra Image 1">
+            </div>
+            {% endif %}
+            {% if product.extra_image2 %}
+            <div class="thumbnail" data-image="{{ product.extra_image2.url }}">
+              <img src="{{ product.extra_image2.url }}" alt="Extra Image 2">
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Product Information -->
+      <div class="product-info">
+        <div class="product-header">
+          <h1 class="product-title">{{ product.name }}</h1>
+        </div>
+
+        <div class="product-pricing">
+          {% if product.is_sale %}
+          <div class="price-container">
+            <span class="price-original">${{ product.price }}</span>
+            <span class="price-current">${{ product.sale_price }}</span>
+            <div class="sale-savings">
+              Save ${{ product.price|floatformat:2 }}
+            </div>
+          </div>
+          {% else %}
+          <div class="price-container">
+            <span class="price-current">${{ product.price }}</span>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="product-description">
+          <p>{{ product.description }}</p>
+          <div class="details-content">
+            {{ product.details|linebreaks }}
+          </div>
+        </div>
+
+        <!-- Product Specifications -->
+        <div class="product-specs">
+          {% if product.color %}
+          <div class="spec-item">
+            <i class="bi bi-palette"></i>
+            <div class="spec-content">
+              <span class="spec-label">Color</span>
+              <span class="spec-value">{{ product.color }}</span>
+            </div>
+          </div>
+          {% endif %}
+
+          {% if product.material %}
+          <div class="spec-item">
+            <i class="bi bi-gem"></i>
+            <div class="spec-content">
+              <span class="spec-label">Material</span>
+              <span class="spec-value">{{ product.material }}</span>
+            </div>
+          </div>
+          {% endif %}
+
+          <div class="spec-item">
+            <i class="bi bi-grid-3x3-gap"></i>
+            <div class="spec-content">
+              <span class="spec-label">Category</span>
+              <span class="spec-value">{{ product.category.name }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Purchase Section -->
+        <div class="purchase-section">
+          {% if not product.sold_out %}
+          
+          <!-- Head Size Selection -->
+          {% if product.head_sizes.exists or product.allow_custom_size %}
+          <div class="head-size-selector">
+            <h4 class="size-section-title">HEAD SIZE</h4>
+            
+            <div class="size-options-grid">
+              <!-- Predefined Head Sizes -->
+              {% for size in product.head_sizes.all %}
+              <div class="size-option">
+                <input type="radio" id="size_{{ size.id }}" name="selected_size" value="{{ size.cm }} | {{ size.inches }} | {{ size.standard_size }}" class="size-radio">
+                <label for="size_{{ size.id }}" class="size-option-label">
+                  <span class="size-combined">{{ size.cm }} | {{ size.inches }} | {{ size.standard_size }}</span>
+                </label>
+              </div>
+              {% endfor %}
+              
+              <!-- Custom Size Option -->
+              {% if product.allow_custom_size %}
+              <div class="size-option custom-size-option">
+                <input type="radio" id="custom_size_radio" name="selected_size" value="custom" class="size-radio">
+                <label for="custom_size_radio" class="size-option-label">
+                  <span class="custom-size-text">CUSTOM SIZE NEEDED</span>
+                </label>
+              </div>
+              {% endif %}
+            </div>
+            
+            <!-- Custom Size Input (hidden by default) -->
+            {% if product.allow_custom_size %}
+            <div class="custom-size-input-container" id="custom-size-input" style="display: none;">
+              <label for="custom_size" class="custom-size-label">Enter your custom measurements:</label>
+              <input type="text" 
+                     id="custom_size" 
+                     name="custom_size" 
+                     placeholder="e.g., 60cm or specific measurements..." 
+                     class="custom-size-input"
+                     maxlength="100">
+            </div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- Quantity Selection -->
+          <div class="quantity-selector">
+            <label class="quantity-label">Quantity</label>
+            <div class="quantity-controls">
+              <button class="quantity-btn" id="decrease-qty">-</button>
+              <input type="number" class="quantity-input" id="qty-cart" value="1" min="1" max="10">
+              <button class="quantity-btn" id="increase-qty">+</button>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons">
+            <button class="btn-premium add-to-cart-btn" id="add-cart" data-product-id="{{ product.id }}">
+              <i class="bi bi-cart-plus"></i>
+              Add to Cart
+            </button>
+            
+            <a href="{% url 'add_to_wishlist' product.id %}" class="btn-premium-outline wishlist-btn">
+              <i class="bi bi-heart"></i>
+              Add to Wishlist
+            </a>
+          </div>
+          {% else %}
+          <!-- Sold Out State -->
+          <div class="sold-out-state">
+            <div class="sold-out-message">
+              <i class="bi bi-x-circle"></i>
+              <span>This item is currently out of stock</span>
+            </div>
+            <div class="sold-out-actions">
+              <a href="{% url 'add_to_wishlist' product.id %}" class="btn-premium-outline wishlist-btn">
+                <i class="bi bi-heart"></i>
+                Add to Wishlist
+              </a>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products Section -->
+    <section class="related-products">
+      <div class="section-header">
+        <h3 class="section-title">Related Products</h3>
+        <a href="{% url 'category' product.category.name|slugify %}" class="view-all-link">
+          View All <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+      
+      {% if related_products %}
+      <div class="products-grid">
+        {% for related_product in related_products %}
+        <div class="premium-card product-card {% if related_product.sold_out %}sold-out{% endif %}">
+          <div class="product-image">
+            <img loading="lazy" src="{{ related_product.image.url }}" alt="{{ related_product.name }}">
+            
+            <!-- Ultra Premium Minimalist Badges for Related Products -->
+            <div class="product-badges-container">
+              {% if related_product.sold_out %}
+              <div class="product-badge soldout-badge">Sold Out</div>
+              {% endif %}
+              
+              {% if related_product.is_unique %}
+              <div class="product-badge unique-badge">Unique</div>
+              {% endif %}
+              
+              {% if related_product.is_sale %}
+              <div class="product-badge sale-badge">Sale</div>
+              {% endif %}
+            </div>
+            
+            <div class="product-actions">
+              <a href="{% url 'add_to_wishlist' related_product.id %}" class="action-btn wishlist-btn">
+                <i class="bi bi-heart"></i>
+              </a>
+              <button class="action-btn quick-view-btn" data-product="{{ related_product.id }}">
+                <i class="bi bi-eye"></i>
+              </button>
+            </div>
+          </div>
+          <div class="product-info">
+            <h4 class="product-name">{{ related_product.name }}</h4>
+            <div class="product-price">
+              {% if related_product.is_sale %}
+              <div class="price-group">
+                <span class="price-old">${{ related_product.price }}</span>
+                <span class="price-new">${{ related_product.sale_price }}</span>
+                {% if related_product.sold_out %}
+                <span class="price-separator">•</span>
+                {% endif %}
+              </div>
+              {% else %}
+              <span class="price-current1" >${{ related_product.price }}</span>
+              {% endif %}
+            </div>
+            <a href="{% url 'product' related_product.id %}" class="product-link">
+              {% if related_product.sold_out %}
+              View Details
+              <i class="bi bi-arrow-right"></i>
+              {% else %}
+              Shop Now
+              <i class="bi bi-arrow-right"></i>
+              {% endif %}
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <i class="bi bi-search empty-icon"></i>
+        <h4>No related products found</h4>
+        <p>Try browsing similar categories</p>
+        <a href="{% url 'category' product.category.name|slugify %}" class="btn-premium-outline">
+          Browse {{ product.category.name }}
+        </a>
+      </div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+
+<!-- ==================== PREMIUM ZOOM MODAL FOR PRODUCT PAGE ==================== -->
+<div class="zoom-modal-premium" id="zoomModal">
+  <div class="zoom-modal-overlay-premium"></div>
+  <div class="zoom-modal-container-premium">
+    
+    <!-- Premium Header -->
+    <div class="zoom-header-premium">
+      <div class="header-content-premium">
+        <div class="product-info-premium">
+          <h3 class="product-name-premium" id="zoomProductName">{{ product.name }}</h3>
+          <div class="product-price-premium" id="zoomProductPrice">
+            {% if product.is_sale %}${{ product.sale_price }}{% else %}${{ product.price }}{% endif %}
+          </div>
+        </div>
+        <div class="header-actions-premium">
+          <button class="premium-action-btn zoom-reset-mini" id="zoomResetMini" title="Reset Zoom">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+          <button class="premium-action-btn zoom-fullscreen-btn" id="zoomFullscreenBtn" title="Fullscreen">
+            <i class="bi bi-arrows-fullscreen"></i>
+          </button>
+          <button class="premium-action-btn zoom-close-premium" id="zoomCloseBtn">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Premium Image Container -->
+    <div class="zoom-image-container-premium" id="zoomImageContainer">
+      <img id="zoomImage" src="{{ product.image.url }}" alt="{{ product.name }}" class="premium-zoom-image">
+
+      <!-- Navigation Arrows -->
+      <button class="nav-arrow nav-prev" id="navPrev">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <button class="nav-arrow nav-next" id="navNext">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Premium Controls -->
+    <div class="zoom-controls-premium">
+      <div class="controls-group">
+        <button class="control-btn-premium zoom-out-premium" id="zoomOutBtn">
+          <i class="bi bi-dash-lg"></i>
+          <span class="control-label">Zoom Out</span>
+        </button>
+        
+        <button class="control-btn-premium primary zoom-reset-premium" id="zoomResetBtn">
+          <i class="bi bi-arrow-clockwise"></i>
+          <span class="control-label">Reset</span>
+        </button>
+        
+        <button class="control-btn-premium zoom-in-premium" id="zoomInBtn">
+          <i class="bi bi-plus-lg"></i>
+          <span class="control-label">Zoom In</span>
+        </button>
+      </div>
+      
+      <div class="action-group">
+        <span class="image-counter" id="imageCounter">1 / {% if product.extra_image1 or product.extra_image2 %}{% if product.extra_image1 and product.extra_image2 %}3{% elif product.extra_image1 or product.extra_image2 %}2{% else %}1{% endif %}{% else %}1{% endif %}</span>
+      </div>
+    </div>
+
+    <!-- Mobile Gesture Hint -->
+    <div class="mobile-gesture-hint">
+      <div class="gesture-hint-content">
+        <div class="hint-item">
+          <div class="hint-icon">🔍</div>
+          <span>Pinch to zoom</span>
+        </div>
+        <div class="hint-item">
+          <div class="hint-icon">👆</div>
+          <span>Drag to explore</span>
+        </div>
+        <div class="hint-item">
+          <div class="hint-icon">💫</div>
+          <span>Double tap to reset</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+/* ==================== PREMIUM ZOOM MODAL STYLES ==================== */
+.zoom-modal-premium {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.zoom-modal-premium.active {
+  display: flex;
+}
+
+.zoom-modal-overlay-premium {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, 
+    rgba(10, 10, 10, 0.98) 0%,
+    rgba(15, 15, 15, 0.97) 50%,
+    rgba(10, 10, 10, 0.98) 100%);
+  backdrop-filter: blur(30px);
+  animation: overlayFadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.zoom-modal-container-premium {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: 28px;
+  box-shadow: 
+    0 40px 80px rgba(0, 0, 0, 0.8),
+    0 0 0 1px rgba(198, 166, 100, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-dark);
+  max-width: 95vw;
+  max-height: 95vh;
+  width: 1000px;
+  height: 800px;
+  display: flex;
+  flex-direction: column;
+  z-index: 10001;
+  animation: modalAppear 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Premium Header */
+.zoom-header-premium {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border-dark);
+  background: linear-gradient(135deg, 
+    rgba(26, 26, 26, 0.95) 0%,
+    rgba(30, 30, 30, 0.9) 100%);
+  backdrop-filter: blur(20px);
+}
+
+.header-content-premium {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.product-info-premium {
+  flex: 1;
+}
+
+.product-name-premium {
+  color: var(--text-on-dark);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.2;
+  font-family: 'Unica One', cursive;
+  letter-spacing: 0.5px;
+}
+
+.product-price-premium {
+  color: var(--gold-primary);
+  font-size: 1.3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-actions-premium {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.premium-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-dark);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  font-size: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.premium-action-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.premium-action-btn:hover {
+  background: var(--gold-primary);
+  color: var(--bg-dark);
+  border-color: var(--gold-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(198, 166, 100, 0.3);
+}
+
+.premium-action-btn:hover::before {
+  left: 100%;
+}
+
+/* Premium Image Container */
+.zoom-image-container-premium {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: 
+    radial-gradient(circle at 50% 50%, rgba(198, 166, 100, 0.05) 0%, transparent 50%),
+    var(--bg-darker);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-in;
+  min-height: 400px;
+}
+
+.zoom-image-container-premium.zoomed {
+  cursor: grab;
+}
+
+.zoom-image-container-premium.zoomed:active {
+  cursor: grabbing;
+}
+
+.premium-zoom-image {
+  max-width: 90%;
+  max-height: 90%;
+  object-fit: contain;
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-origin: center center;
+  user-select: none;
+  -webkit-user-select: none;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.5));
+}
+
+/* Navigation Arrows */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(10, 10, 10, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-dark);
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-on-dark);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 1;
+  z-index: 10;
+}
+
+.nav-prev {
+  left: 2rem;
+}
+
+.nav-next {
+  right: 2rem;
+}
+
+.nav-arrow:hover {
+  background: var(--gold-primary);
+  color: var(--bg-dark);
+  border-color: var(--gold-primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+/* Premium Controls */
+.zoom-controls-premium {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--border-dark);
+  background: linear-gradient(135deg, 
+    rgba(26, 26, 26, 0.95) 0%,
+    rgba(30, 30, 30, 0.9) 100%);
+  backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.controls-group {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.control-btn-premium {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-dark);
+  border-radius: 16px;
+  padding: 0.875rem 1.5rem;
+  color: var(--text-on-dark);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.control-btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.6s ease;
+}
+
+.control-btn-premium:hover {
+  background: var(--gold-primary);
+  color: var(--bg-dark);
+  border-color: var(--gold-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(198, 166, 100, 0.3);
+}
+
+.control-btn-premium:hover::before {
+  left: 100%;
+}
+
+.control-btn-premium.primary {
+  background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark));
+  color: var(--text-dark);
+  border-color: var(--gold-primary);
+}
+
+.control-btn-premium:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.control-btn-premium:disabled:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-on-dark);
+  border-color: var(--border-dark);
+  box-shadow: none;
+}
+
+.action-group {
+  flex-shrink: 0;
+}
+
+.image-counter {
+  color: var(--text-on-dark);
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  border: 1px solid var(--border-dark);
+}
+
+/* Mobile Gesture Hint */
+.mobile-gesture-hint {
+  display: none;
+  position: absolute;
+  bottom: 120px;
+  left: 0;
+  right: 0;
+  padding: 1rem 2rem;
+}
+
+.gesture-hint-content {
+  display: flex;
+  justify-content: space-around;
+  background: rgba(198, 166, 100, 0.1);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(198, 166, 100, 0.2);
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.hint-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--gold-light);
+}
+
+.hint-icon {
+  font-size: 1.3rem;
+  filter: grayscale(0.3);
+}
+
+.hint-item span {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .zoom-modal-container-premium {
+    width: 95vw;
+    height: 85vh;
+    margin: 2rem;
+  }
+  
+  .zoom-header-premium {
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .product-name-premium {
+    font-size: 1.3rem;
+  }
+  
+  .zoom-controls-premium {
+    padding: 1.25rem 1.5rem;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .controls-group {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .action-group {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .zoom-modal-premium {
+    padding: 0;
+  }
+  
+  .zoom-modal-container-premium {
+    width: 100vw;
+    height: 100vh;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+    margin: 0;
+  }
+  
+  .zoom-header-premium {
+    padding: 1rem 1.25rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10002;
+    border-bottom: 1px solid var(--border-dark);
+  }
+  
+  .header-content-premium {
+    gap: 1rem;
+  }
+  
+  .product-name-premium {
+    font-size: 1.2rem;
+  }
+  
+  .product-price-premium {
+    font-size: 1.1rem;
+  }
+  
+  .premium-action-btn {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .zoom-image-container-premium {
+    margin-top: 80px;
+    margin-bottom: 140px;
+  }
+  
+  .zoom-controls-premium {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--border-dark);
+    z-index: 10002;
+  }
+  
+  .controls-group {
+    gap: 0.75rem;
+  }
+  
+  .control-btn-premium {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+  
+  .control-label {
+    display: none;
+  }
+  
+  .nav-arrow {
+    width: 44px;
+    height: 44px;
+    font-size: 0.9rem;
+  }
+  
+  .nav-prev {
+    left: 1rem;
+  }
+  
+  .nav-next {
+    right: 1rem;
+  }
+  
+  .mobile-gesture-hint {
+    display: block;
+    bottom: 160px;
+  }
+  
+  .gesture-hint-content {
+    padding: 0.875rem;
+  }
+  
+  .hint-item span {
+    font-size: 0.7rem;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+  .zoom-header-premium {
+    padding: 0.875rem 1rem;
+  }
+  
+  .product-name-premium {
+    font-size: 1.1rem;
+  }
+  
+  .premium-action-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  .zoom-controls-premium {
+    padding: 0.875rem 1rem;
+  }
+  
+  .control-btn-premium {
+    padding: 0.875rem;
+    border-radius: 14px;
+  }
+  
+  .mobile-gesture-hint {
+    bottom: 150px;
+    padding: 0.875rem 1rem;
+  }
+  
+  .gesture-hint-content {
+    padding: 0.75rem;
+  }
+  
+  .hint-icon {
+    font-size: 1.1rem;
+  }
+  
+  .hint-item span {
+    font-size: 0.65rem;
+  }
+}
+
+/* Fullscreen Mode */
+.zoom-modal-premium.fullscreen .zoom-modal-container-premium {
+  width: 100vw;
+  height: 100vh;
+  max-width: 100vw;
+  max-height: 100vh;
+  border-radius: 0;
+}
+
+.zoom-modal-premium.fullscreen .zoom-header-premium,
+.zoom-modal-premium.fullscreen .zoom-controls-premium,
+.zoom-modal-premium.fullscreen .mobile-gesture-hint {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.zoom-modal-premium.fullscreen:hover .zoom-header-premium,
+.zoom-modal-premium.fullscreen:hover .zoom-controls-premium,
+.zoom-modal-premium.fullscreen:hover .mobile-gesture-hint {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Body scroll lock */
+body.zoom-modal-open {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+/* Hide scrollbars */
+.zoom-image-container-premium::-webkit-scrollbar {
+  display: none;
+}
+
+.zoom-image-container-premium {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Head Size Selector Styles - Dark Theme */
+.head-size-selector {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-dark);
+}
+
+.size-section-title {
+  font-family: 'Unica One', cursive;
+  font-size: 1.2rem;
+  color: var(--text-on-dark);
+  margin-bottom: 1rem;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+.size-options-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.size-option {
+  position: relative;
+}
+
+.size-radio {
+  position: absolute;
+  opacity: 0;
+}
+
+.size-option-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  border: 2px solid var(--border-dark);
+  border-radius: 8px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.size-radio:checked + .size-option-label {
+  border-color: var(--gold-primary);
+  background: linear-gradient(135deg, rgba(198, 166, 100, 0.1), transparent);
+  box-shadow: 0 4px 15px rgba(198, 166, 100, 0.2);
+}
+
+.size-option-label:hover {
+  border-color: var(--gold-primary);
+  transform: translateY(-2px);
+  background: var(--bg-card-hover);
+}
+
+.size-combined {
+  font-weight: 700;
+  color: var(--text-on-dark);
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+/* Custom Size Option */
+.custom-size-option .size-option-label {
+  background: linear-gradient(135deg, rgba(40, 40, 40, 0.8), rgba(60, 60, 60, 0.6));
+  border: 2px dashed var(--border-dark);
+}
+
+.custom-size-option .size-radio:checked + .size-option-label {
+  border-color: var(--gold-primary);
+  background: linear-gradient(135deg, rgba(198, 166, 100, 0.1), transparent);
+  border-style: solid;
+}
+
+.custom-size-text {
+  font-weight: 600;
+  color: var(--text-on-dark);
+  font-size: 0.9rem;
+}
+
+/* Custom Size Input */
+.custom-size-input-container {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border-dark);
+  animation: fadeIn 0.3s ease;
+}
+
+.custom-size-label {
+  display: block;
+  font-weight: 600;
+  color: var(--text-on-dark);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.custom-size-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-dark);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  background: var(--bg-dark);
+  color: var(--text-on-dark);
+}
+
+.custom-size-input:focus {
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 0 2px rgba(198, 166, 100, 0.1);
+  outline: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script>
+// Product Page JavaScript with Premium Zoom Modal
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle size radio button changes
+  const sizeRadios = document.querySelectorAll('input[name="selected_size"]');
+  const customSizeInput = document.getElementById('custom-size-input');
+  
+  sizeRadios.forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.value === 'custom' && customSizeInput) {
+        customSizeInput.style.display = 'block';
+      } else if (customSizeInput) {
+        customSizeInput.style.display = 'none';
+      }
+    });
+  });
+
+  // Update the AJAX call for add to cart
+  const addToCartBtn = document.getElementById('add-cart');
+  if (addToCartBtn) {
+    addToCartBtn.addEventListener('click', function() {
+      const productId = this.getAttribute('data-product-id');
+      const quantity = document.getElementById('qty-cart').value;
+      
+      // Get selected size
+      const selectedSizeRadio = document.querySelector('input[name="selected_size"]:checked');
+      let selectedSize = '';
+      let customSize = '';
+      
+      if (selectedSizeRadio) {
+        if (selectedSizeRadio.value === 'custom') {
+          selectedSize = 'custom';
+          customSize = document.getElementById('custom_size')?.value || '';
+        } else {
+          selectedSize = selectedSizeRadio.value;
+        }
+      }
+      
+      // Validate size selection if product requires sizes
+      const hasHeadSizes = {{ product.head_sizes.exists|yesno:"true,false" }};
+      const allowsCustomSize = {{ product.allow_custom_size|yesno:"true,false" }};
+      
+      if ((hasHeadSizes || allowsCustomSize) && !selectedSize) {
+        showNotification('Please select a head size or choose custom size', 'error');
+        return;
+      }
+      
+      if (selectedSize === 'custom' && !customSize) {
+        showNotification('Please enter your custom measurements', 'error');
+        return;
+      }
+      
+      $.ajax({
+        type: 'POST',
+        url: '{% url 'cart_add' %}',
+        data: {
+          product_id: productId,
+          product_qty: quantity,
+          selected_size: selectedSize,
+          custom_size: customSize,
+          csrfmiddlewaretoken: '{{ csrf_token }}',
+          action: 'post'
+        },
+        success: function(json){
+          document.getElementById("cart_quantity").textContent = json.qty;
+          showNotification('Product added to cart!', 'success');
+        },
+        error: function(xhr, errmsg, err){
+          if (xhr.status === 400) {
+            showNotification(xhr.responseJSON.error, 'error');
+          } else {
+            showNotification('Error adding product to cart', 'error');
+          }
+        }
+      });
+    });
+  }
+
+  // Thumbnail gallery functionality
+  const thumbnails = document.querySelectorAll('.thumbnail');
+  const mainImage = document.getElementById('main-product-img');
+  let currentImageIndex = 0;
+
+  // Create array of all available images
+  const productImages = [
+    "{{ product.image.url }}",
+    {% if product.extra_image1 %}"{{ product.extra_image1.url }}",{% endif %}
+    {% if product.extra_image2 %}"{{ product.extra_image2.url }}"{% endif %}
+  ].filter(Boolean);
+
+  thumbnails.forEach((thumb, index) => {
+    thumb.addEventListener('click', function() {
+      const imageUrl = this.getAttribute('data-image');
+      mainImage.src = imageUrl;
+      currentImageIndex = index;
+      
+      thumbnails.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+
+  {% if not product.sold_out %}
+  const decreaseBtn = document.getElementById('decrease-qty');
+  const increaseBtn = document.getElementById('increase-qty');
+  const quantityInput = document.getElementById('qty-cart');
+
+  if (decreaseBtn && increaseBtn && quantityInput) {
+    decreaseBtn.addEventListener('click', function() {
+      let currentValue = parseInt(quantityInput.value);
+      if (currentValue > 1) {
+        quantityInput.value = currentValue - 1;
+      }
+    });
+
+    increaseBtn.addEventListener('click', function() {
+      let currentValue = parseInt(quantityInput.value);
+      if (currentValue < 10) {
+        quantityInput.value = currentValue + 1;
+      }
+    });
+  }
+  {% endif %}
+});
+
+// Premium Zoom Modal Functionality
+let currentZoomScale = 1;
+let isDraggingZoom = false;
+let startX, startY, scrollLeft, scrollTop;
+let lastTapTime = 0;
+let currentZoomImageIndex = 0;
+
+function openZoomModal() {
+  const zoomModal = document.getElementById('zoomModal');
+  const mainImage = document.getElementById('main-product-img');
+  const thumbnails = document.querySelectorAll('.thumbnail');
+  
+  // Find current image index
+  currentZoomImageIndex = Array.from(thumbnails).findIndex(thumb => thumb.classList.contains('active'));
+  if (currentZoomImageIndex === -1) currentZoomImageIndex = 0;
+  
+  loadZoomImage(currentZoomImageIndex);
+  zoomModal.classList.add('active');
+  document.body.classList.add('zoom-modal-open');
+  document.body.style.overflow = 'hidden';
+  
+  // Show mobile gesture hint temporarily
+  if (window.innerWidth <= 768) {
+    const gestureHint = document.querySelector('.mobile-gesture-hint');
+    setTimeout(() => {
+      gestureHint.style.display = 'block';
+    }, 500);
+    
+    setTimeout(() => {
+      gestureHint.style.display = 'none';
+    }, 3000);
+  }
+}
+
+function closeZoomModal() {
+  const zoomModal = document.getElementById('zoomModal');
+  zoomModal.classList.remove('active', 'fullscreen');
+  document.body.classList.remove('zoom-modal-open');
+  document.body.style.overflow = '';
+  resetZoom();
+  
+  // Reset fullscreen button
+  const zoomFullscreenBtn = document.getElementById('zoomFullscreenBtn');
+  zoomFullscreenBtn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+  zoomFullscreenBtn.title = 'Fullscreen';
+}
+
+function loadZoomImage(index) {
+  const zoomImage = document.getElementById('zoomImage');
+  const imageCounter = document.getElementById('imageCounter');
+  const productImages = [
+    "{{ product.image.url }}",
+    {% if product.extra_image1 %}"{{ product.extra_image1.url }}",{% endif %}
+    {% if product.extra_image2 %}"{{ product.extra_image2.url }}"{% endif %}
+  ].filter(Boolean);
+  
+  if (index >= 0 && index < productImages.length) {
+    zoomImage.src = productImages[index];
+    currentZoomImageIndex = index;
+    imageCounter.textContent = `${index + 1} / ${productImages.length}`;
+    resetZoom();
+    
+    // Update thumbnails
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    thumbnails.forEach((thumb, i) => {
+      thumb.classList.toggle('active', i === index);
+    });
+  }
+}
+
+function navigateZoomImages(direction) {
+  const productImages = [
+    "{{ product.image.url }}",
+    {% if product.extra_image1 %}"{{ product.extra_image1.url }}",{% endif %}
+    {% if product.extra_image2 %}"{{ product.extra_image2.url }}"{% endif %}
+  ].filter(Boolean);
+  
+  let newIndex = currentZoomImageIndex + direction;
+  if (newIndex < 0) newIndex = productImages.length - 1;
+  if (newIndex >= productImages.length) newIndex = 0;
+  
+  loadZoomImage(newIndex);
+}
+
+function zoomIn() {
+  currentZoomScale = Math.min(currentZoomScale + 0.25, 5);
+  applyZoom();
+}
+
+function zoomOut() {
+  currentZoomScale = Math.max(currentZoomScale - 0.25, 1);
+  applyZoom();
+}
+
+function resetZoom() {
+  currentZoomScale = 1;
+  applyZoom();
+  const imageContainer = document.getElementById('zoomImageContainer');
+  imageContainer.scrollTo({
+    top: 0,
+    left: 0,
+    behavior: 'smooth'
+  });
+}
+
+function applyZoom() {
+  const zoomImage = document.getElementById('zoomImage');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const zoomResetBtn = document.getElementById('zoomResetBtn');
+  const zoomResetMini = document.getElementById('zoomResetMini');
+  const imageContainer = document.getElementById('zoomImageContainer');
+  
+  zoomImage.style.transform = `scale(${currentZoomScale})`;
+  
+  // Enable/disable buttons
+  zoomOutBtn.disabled = currentZoomScale <= 1;
+  zoomResetBtn.disabled = currentZoomScale === 1;
+  zoomResetMini.disabled = currentZoomScale === 1;
+  
+  // Update cursor
+  imageContainer.style.cursor = currentZoomScale > 1 ? 'grab' : 'zoom-in';
+}
+
+function toggleFullscreen() {
+  const zoomModal = document.getElementById('zoomModal');
+  const zoomFullscreenBtn = document.getElementById('zoomFullscreenBtn');
+  
+  zoomModal.classList.toggle('fullscreen');
+  
+  if (zoomModal.classList.contains('fullscreen')) {
+    zoomFullscreenBtn.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+    zoomFullscreenBtn.title = 'Exit Fullscreen';
+  } else {
+    zoomFullscreenBtn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+    zoomFullscreenBtn.title = 'Fullscreen';
+  }
+}
+
+// Initialize zoom modal when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  const zoomModal = document.getElementById('zoomModal');
+  const zoomCloseBtn = document.getElementById('zoomCloseBtn');
+  const zoomInBtn = document.getElementById('zoomInBtn');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+  const zoomResetBtn = document.getElementById('zoomResetBtn');
+  const zoomResetMini = document.getElementById('zoomResetMini');
+  const zoomFullscreenBtn = document.getElementById('zoomFullscreenBtn');
+  const navPrev = document.getElementById('navPrev');
+  const navNext = document.getElementById('navNext');
+  const imageContainer = document.getElementById('zoomImageContainer');
+  
+  // Event listeners
+  zoomCloseBtn.addEventListener('click', closeZoomModal);
+  zoomInBtn.addEventListener('click', zoomIn);
+  zoomOutBtn.addEventListener('click', zoomOut);
+  zoomResetBtn.addEventListener('click', resetZoom);
+  zoomResetMini.addEventListener('click', resetZoom);
+  zoomFullscreenBtn.addEventListener('click', toggleFullscreen);
+  navPrev.addEventListener('click', () => navigateZoomImages(-1));
+  navNext.addEventListener('click', () => navigateZoomImages(1));
+  
+  // Close modal on overlay click
+  zoomModal.addEventListener('click', function(e) {
+    if (e.target === zoomModal) {
+      closeZoomModal();
+    }
+  });
+  
+  // Keyboard support
+  document.addEventListener('keydown', function(e) {
+    if (zoomModal.classList.contains('active')) {
+      switch(e.key) {
+        case 'Escape':
+          closeZoomModal();
+          break;
+        case 'ArrowLeft':
+          navigateZoomImages(-1);
+          break;
+        case 'ArrowRight':
+          navigateZoomImages(1);
+          break;
+        case '+':
+        case '=':
+          e.preventDefault();
+          zoomIn();
+          break;
+        case '-':
+          e.preventDefault();
+          zoomOut();
+          break;
+        case '0':
+          e.preventDefault();
+          resetZoom();
+          break;
+        case 'f':
+        case 'F':
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+      }
+    }
+  });
+  
+  // Mouse wheel zoom
+  imageContainer.addEventListener('wheel', function(e) {
+    if (zoomModal.classList.contains('active')) {
+      e.preventDefault();
+      
+      if (e.deltaY < 0) {
+        zoomIn();
+      } else {
+        zoomOut();
+      }
+    }
+  });
+  
+  // Double tap to reset (mobile)
+  imageContainer.addEventListener('touchend', function(e) {
+    if (zoomModal.classList.contains('active')) {
+      const currentTime = new Date().getTime();
+      const tapLength = currentTime - lastTapTime;
+      
+      if (tapLength < 300 && tapLength > 0) {
+        e.preventDefault();
+        resetZoom();
+      }
+      
+      lastTapTime = currentTime;
+    }
+  });
+  
+  // Touch gestures for mobile zoom
+  let initialDistance = null;
+  
+  imageContainer.addEventListener('touchstart', function(e) {
+    if (zoomModal.classList.contains('active') && e.touches.length === 2) {
+      e.preventDefault();
+      initialDistance = getDistance(e.touches[0], e.touches[1]);
+    }
+  });
+  
+  imageContainer.addEventListener('touchmove', function(e) {
+    if (zoomModal.classList.contains('active') && e.touches.length === 2) {
+      e.preventDefault();
+      const currentDistance = getDistance(e.touches[0], e.touches[1]);
+      
+      if (initialDistance !== null) {
+        const scaleFactor = currentDistance / initialDistance;
+        currentZoomScale = Math.min(Math.max(currentZoomScale * scaleFactor, 1), 5);
+        applyZoom();
+        initialDistance = currentDistance;
+      }
+    }
+  });
+  
+  imageContainer.addEventListener('touchend', function() {
+    initialDistance = null;
+  });
+  
+  // Drag functionality for zoomed image
+  imageContainer.addEventListener('mousedown', startDragZoom);
+  imageContainer.addEventListener('touchstart', startDragZoom);
+  
+  document.addEventListener('mousemove', dragZoom);
+  document.addEventListener('touchmove', dragZoom);
+  
+  document.addEventListener('mouseup', endDragZoom);
+  document.addEventListener('touchend', endDragZoom);
+  
+  function startDragZoom(e) {
+    if (zoomModal.classList.contains('active') && currentZoomScale > 1) {
+      isDraggingZoom = true;
+      imageContainer.classList.add('zoomed');
+      
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+      
+      startX = clientX - imageContainer.getBoundingClientRect().left;
+      startY = clientY - imageContainer.getBoundingClientRect().top;
+      scrollLeft = imageContainer.scrollLeft;
+      scrollTop = imageContainer.scrollTop;
+      
+      if (e.cancelable) e.preventDefault();
+    }
+  }
+  
+  function dragZoom(e) {
+    if (!isDraggingZoom) return;
+    
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    
+    const x = clientX - imageContainer.getBoundingClientRect().left;
+    const y = clientY - imageContainer.getBoundingClientRect().top;
+    
+    const walkX = (x - startX) * 3;
+    const walkY = (y - startY) * 3;
+    
+    imageContainer.scrollLeft = scrollLeft - walkX;
+    imageContainer.scrollTop = scrollTop - walkY;
+    
+    if (e.cancelable) e.preventDefault();
+  }
+  
+  function endDragZoom() {
+    isDraggingZoom = false;
+    imageContainer.classList.remove('zoomed');
+  }
+  
+  function getDistance(touch1, touch2) {
+    return Math.sqrt(
+      Math.pow(touch2.clientX - touch1.clientX, 2) +
+      Math.pow(touch2.clientY - touch1.clientY, 2)
+    );
+  }
+  
+  // Prevent elastic scroll on iOS
+  document.addEventListener('touchmove', function(e) {
+    if (zoomModal.classList.contains('active')) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+});
+
+// Utility functions
+function showNotification(message, type) {
+  // Your existing notification function
+  console.log(`${type}: ${message}`);
+}
+
+function showQuickView(productId) {
+  console.log('Quick view for product:', productId);
+  showNotification('Quick view feature coming soon!', 'success');
+}
+</script>
+{% endblock %}

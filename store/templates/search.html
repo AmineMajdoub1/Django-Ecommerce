@@ -1,0 +1,930 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+
+<!-- Premium Header -->
+<header class="premium-hero-section">
+  <div class="hero-background">
+    <div class="background-elements">
+      <div class="floating-element el-1"></div>
+      <div class="floating-element el-2"></div>
+      <div class="floating-element el-3"></div>
+      <div class="floating-element el-4"></div>
+    </div>
+    <div class="gradient-overlay"></div>
+  </div>
+  
+  <div class="container">
+    <div class="hero-content">
+      <div class="brand-presentation">
+        <div class="logo-glow"></div>
+        <h1 class="brand-title">
+          <span class="title-main">Discover</span>
+          <span class="title-subtitle">OUR COLLECTION</span>
+        </h1>
+        <div class="hero-divider">
+          <div class="divider-line"></div>
+          <div class="divider-dot"></div>
+          <div class="divider-line"></div>
+        </div>
+        <p class="hero-tagline">Find your perfect piece with precision search</p>
+      </div>
+      
+      <!-- Search Form Integration -->
+      <div class="search-global-container">
+        <form method="get" class="global-search-form">
+          <div class="search-input-group">
+            <i class="bi bi-search search-icon"></i>
+            <input type="text" name="q" value="{{ query }}" placeholder="Search products, collections, styles..." 
+                   class="global-search-input">
+            <!-- Close Button -->
+            <button type="button" class="search-close-btn" onclick="closeSearch()">
+              <i class="bi bi-x-lg"></i>
+            </button>
+            <button type="submit" class="search-submit-btn">
+              <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container-fluid py-4">
+    <div class="row g-4">
+        <!-- Mobile Filter Toggle -->
+        <div class="col-12 d-lg-none">
+            <button class="mobile-filter-toggle">
+                <i class="bi bi-funnel"></i>
+                Filters
+                <span class="filter-count" id="mobileFilterCount">0</span>
+            </button>
+        </div>
+
+        <!-- Premium Sidebar Filters -->
+        <aside class="col-lg-3">
+            <div class="filter-sidebar">
+                <button class="filter-close-btn d-lg-none">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+                <div class="filter-header">
+                    <h4 class="filter-title">Refine Search</h4>
+                    <button type="button" class="filter-clear-btn" onclick="clearFilters()">
+                        Clear All
+                    </button>
+                </div>
+
+                <form method="get" id="filter-form" class="filter-form">
+                    
+                    <!-- Custom Size Available Filter -->
+                    <div class="filter-section">
+                        <h6 class="filter-section-title">
+                            <i class="bi bi-pencil-square"></i>
+                            Custom Size Options
+                        </h6>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" name="custom_size_available" value="true" 
+                                       {% if custom_size_available %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                <span class="option-label">Custom Size Available</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Head Size Filter -->
+                    <div class="filter-section">
+                        <h6 class="filter-section-title">
+                            <i class="bi bi-rulers"></i>
+                            Head Size
+                        </h6>
+                        <div class="filter-search-container">
+                            <i class="bi bi-search filter-search-icon"></i>
+                            <input type="text" class="filter-search-input" placeholder="Search head sizes..." 
+                                   onkeyup="filterItems(this, 'head_size')">
+                        </div>
+                        <div class="filter-options" id="head_size-filters">
+                            {% for head_size in head_sizes_db %}
+                            <label class="filter-option">
+                                <input type="checkbox" name="head_size" value="{{ head_size.id }}" 
+                                       {% if head_size.id|stringformat:"s" in selected_head_sizes %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                <span class="option-label">{{ head_size.cm }} | {{ head_size.inches }} | {{ head_size.standard_size }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% if head_sizes_db|length > 5 %}
+                        <button type="button" class="show-more-btn" onclick="toggleShowMore('head_size')">
+                            Show More <i class="bi bi-chevron-down"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    <!-- Color Filter -->
+                    <div class="filter-section">
+                        <h6 class="filter-section-title">
+                            <i class="bi bi-palette"></i>
+                            Color
+                        </h6>
+                        <div class="filter-search-container">
+                            <i class="bi bi-search filter-search-icon"></i>
+                            <input type="text" class="filter-search-input" placeholder="Search colors..." 
+                                   onkeyup="filterItems(this, 'color')">
+                        </div>
+                        <div class="filter-options" id="color-filters">
+                            {% for c in colors_db %}
+                            <label class="filter-option">
+                                <input type="checkbox" name="color" value="{{ c }}" 
+                                       {% if c in selected_colors %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                <span class="option-label">{{ c }}</span>
+                            </label>
+                            {% endfor %}
+                        </div>
+                        {% if colors_db|length > 5 %}
+                        <button type="button" class="show-more-btn" onclick="toggleShowMore('color')">
+                            Show More <i class="bi bi-chevron-down"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    <button type="submit" class="filter-apply-btn">
+                        <i class="bi bi-funnel"></i>
+                        Apply Filters
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Filter Overlay for Mobile -->
+        <div class="filter-overlay"></div>
+
+        <!-- Main Content -->
+        <main class="col-lg-9">
+            <!-- Premium Tabs -->
+            <div class="content-header">
+                <div class="results-info">
+                    <h2 class="results-title" id="results-title">Products</h2>
+                    <span class="results-count">{{ products|length }} items found</span>
+                </div>
+                <div class="view-controls">
+                    <div class="premium-tabs">
+                        <button id="products-tab" class="premium-tab active" data-tab="products">
+                            <i class="bi bi-grid"></i>
+                            Products
+                        </button>
+                        <button id="collections-tab" class="premium-tab" data-tab="collections">
+                            <i class="bi bi-collection"></i>
+                            Collections
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Section -->
+            <section id="products-section" class="content-section active">
+                {% if products %}
+                <div class="products-grid">
+                    {% for product in products %}
+                    <div class="product-card {% if product.sold_out %}sold-out{% endif %}">
+                        <div class="product-image">
+                            <img loading="lazy" src="{{ product.image.url }}" alt="{{ product.name }}">
+                            
+                            <!-- Ultra Premium Minimalist Badges -->
+                            <div class="product-badges-container">
+                                {% if product.sold_out %}
+                                <div class="product-badge soldout-badge">Sold Out</div>
+                                {% endif %}
+                                
+                                {% if product.is_unique %}
+                                <div class="product-badge unique-badge">Unique</div>
+                                {% endif %}
+                                
+                                {% if product.is_sale %}
+                                <div class="product-badge sale-badge">Sale</div>
+                                {% endif %}
+                                
+                                <!-- Custom Size Badge -->
+                                {% if product.allow_custom_size %}
+                                <div class="product-badge custom-badge">Custom Size</div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="product-actions">
+                                <a href="{% url 'add_to_wishlist' product.id %}" class="action-btn wishlist-btn">
+                                    <i class="bi bi-heart"></i>
+                                </a>
+                                <button class="action-btn quick-view-btn" data-product="{{ product.id }}">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="product-info">
+                            <h4 class="product-name">{{ product.name }}</h4>
+                            <div class="product-price">
+                                {% if product.is_sale %}
+                                <div class="price-group">
+                                    <span class="price-old">${{ product.price }}</span>
+                                    <span class="price-new">${{ product.sale_price }}</span>
+                                    {% if product.sold_out %}
+                                    <span class="price-separator">•</span>
+                                    {% endif %}
+                                </div>
+                                {% else %}
+                                <span class="price-current">${{ product.price }}</span>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Size Information -->
+                            <div class="product-size-info">
+                                {% if product.head_sizes.exists %}
+                                <small class="size-available">Available in {{ product.head_sizes.count }} sizes</small>
+                                {% endif %}
+                                {% if product.allow_custom_size %}
+                                <small class="custom-available">• Custom sizes available</small>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- Premium View Details CTA -->
+                            <a href="{% url 'product' product.id %}" class="product-link">
+                                {% if product.sold_out %}
+                                View Details
+                                <i class="bi bi-arrow-right"></i>
+                                {% else %}
+                                Shop Now
+                                <i class="bi bi-arrow-right"></i>
+                                {% endif %}
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-search empty-icon"></i>
+                    <h4>No products found</h4>
+                    <p>Try adjusting your filters or search terms</p>
+                    <button class="btn-clear-filters" onclick="clearFilters()">Clear All Filters</button>
+                </div>
+                {% endif %}
+
+                <!-- Premium Pagination -->
+                {% if page_obj.paginator.num_pages > 1 %}
+                <div class="pagination-container">
+                    <nav class="pagination">
+                        {% if page_obj.has_previous %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" 
+                           class="pagination-btn prev">
+                            <i class="bi bi-chevron-left"></i>
+                            Previous
+                        </a>
+                        {% endif %}
+
+                        <div class="pagination-pages">
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if num == page_obj.number %}
+                                <span class="pagination-page active">{{ num }}</span>
+                                {% else %}
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}" 
+                                   class="pagination-page">{{ num }}</a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+
+                        {% if page_obj.has_next %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" 
+                           class="pagination-btn next">
+                            Next
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                        {% endif %}
+                    </nav>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Collections Section -->
+            <section id="collections-section" class="content-section">
+                {% if categories %}
+                <div class="collections-grid">
+                    {% for category in categories %}
+                    <div class="collection-card">
+                        <div class="collection-image">
+                            <img loading="lazy" src="{{ category.image.url }}" alt="{{ category.name }}">
+                            <div class="collection-overlay">
+                                <a href="{% url 'category' category.name|slugify %}" class="collection-link">
+                                    Explore Collection
+                                    <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="collection-info">
+                            <h4 class="collection-name">{{ category.name }}</h4>
+                            <p class="collection-description">{{ category.description }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-collection empty-icon"></i>
+                    <h4>No collections found</h4>
+                    <p>Try searching for different terms</p>
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Premium Zoom Modal -->
+            <div class="zoom-modal-premium" id="zoomModal">
+                <div class="zoom-modal-overlay-premium"></div>
+                <div class="zoom-modal-container-premium">
+                    
+                    <!-- Premium Header -->
+                    <div class="zoom-header-premium">
+                        <div class="header-content-premium">
+                            <div class="product-info-premium">
+                                <h3 class="product-name-premium" id="zoomProductName">Product Name</h3>
+                                <div class="product-price-premium" id="zoomProductPrice">$0.00</div>
+                            </div>
+                            <div class="header-actions-premium">
+                                <button class="premium-action-btn zoom-reset-mini" id="zoomResetMini" title="Reset Zoom">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                                <button class="premium-action-btn zoom-fullscreen-btn" id="zoomFullscreenBtn" title="Fullscreen">
+                                    <i class="bi bi-arrows-fullscreen"></i>
+                                </button>
+                                <button class="premium-action-btn zoom-close-premium" id="zoomCloseBtn">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Premium Image Container -->
+                    <div class="zoom-image-container-premium" id="zoomImageContainer">
+                        <img id="zoomImage" src="" alt="Product Image" class="premium-zoom-image">
+                        
+                        <!-- Navigation Arrows -->
+                        <button class="nav-arrow nav-prev" id="navPrev">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="nav-arrow nav-next" id="navNext">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <!-- Premium Controls -->
+                    <div class="zoom-controls-premium">
+                        <div class="controls-group">
+                            <button class="control-btn-premium zoom-out-premium" id="zoomOutBtn">
+                                <i class="bi bi-dash-lg"></i>
+                                <span class="control-label">Zoom Out</span>
+                            </button>
+                            
+                            <button class="control-btn-premium primary zoom-reset-premium" id="zoomResetBtn">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                <span class="control-label">Reset</span>
+                            </button>
+                            
+                            <button class="control-btn-premium zoom-in-premium" id="zoomInBtn">
+                                <i class="bi bi-plus-lg"></i>
+                                <span class="control-label">Zoom In</span>
+                            </button>
+                        </div>
+                        
+                        <div class="action-group">
+                            <a href="#" class="premium-cta-btn" id="viewDetailsBtn">
+                                <span>View Product Details</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Gesture Hint -->
+                    <div class="mobile-gesture-hint">
+                        <div class="gesture-hint-content">
+                            <div class="hint-item">
+                                <div class="hint-icon">🔍</div>
+                                <span>Pinch to zoom</span>
+                            </div>
+                            <div class="hint-item">
+                                <div class="hint-icon">👆</div>
+                                <span>Drag to explore</span>
+                            </div>
+                            <div class="hint-item">
+                                <div class="hint-icon">💫</div>
+                                <span>Double tap to reset</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<style>
+/* Custom Badge Styles */
+.product-badge.custom-badge {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.product-size-info {
+    margin: 0.5rem 0;
+}
+
+.size-available {
+    color: var(--text-light);
+    font-size: 0.8rem;
+}
+
+.custom-available {
+    color: #667eea;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+</style>
+
+<!-- JavaScript -->
+<script>
+// Tab switching functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const productsTab = document.getElementById('products-tab');
+    const collectionsTab = document.getElementById('collections-tab');
+    const productsSection = document.getElementById('products-section');
+    const collectionsSection = document.getElementById('collections-section');
+    const resultsTitle = document.getElementById('results-title');
+    const resultsCount = document.querySelector('.results-count');
+
+    function switchTab(tab) {
+        // Update tabs
+        productsTab.classList.toggle('active', tab === 'products');
+        collectionsTab.classList.toggle('active', tab === 'collections');
+        
+        // Update sections
+        productsSection.classList.toggle('active', tab === 'products');
+        collectionsSection.classList.toggle('active', tab === 'collections');
+        
+        // Update title and count
+        if (tab === 'products') {
+            resultsTitle.textContent = 'Products';
+            resultsCount.textContent = '{{ products|length }} items found';
+        } else {
+            resultsTitle.textContent = 'Collections';
+            resultsCount.textContent = '{{ categories|length }} collections found';
+        }
+    }
+
+    productsTab.addEventListener('click', () => switchTab('products'));
+    collectionsTab.addEventListener('click', () => switchTab('collections'));
+
+    // Initialize mobile filters
+    initializeMobileFilters();
+});
+
+// Mobile Filter Functionality
+function initializeMobileFilters() {
+    const filterSidebar = document.querySelector('.filter-sidebar');
+    const filterOverlay = document.querySelector('.filter-overlay');
+    const mobileFilterToggle = document.querySelector('.mobile-filter-toggle');
+    const filterCloseBtn = document.querySelector('.filter-close-btn');
+
+    // Toggle filters on mobile
+    if (mobileFilterToggle) {
+        mobileFilterToggle.addEventListener('click', () => {
+            filterSidebar.classList.add('active');
+            filterOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    // Close filters
+    if (filterCloseBtn) {
+        filterCloseBtn.addEventListener('click', closeMobileFilters);
+    }
+
+    if (filterOverlay) {
+        filterOverlay.addEventListener('click', closeMobileFilters);
+    }
+
+    // Update mobile filter count
+    function updateMobileFilterCount() {
+        const count = document.querySelectorAll('input[type="checkbox"]:checked').length;
+        const mobileFilterCount = document.getElementById('mobileFilterCount');
+        if (mobileFilterCount) {
+            mobileFilterCount.textContent = count;
+        }
+    }
+
+    // Initialize count
+    updateMobileFilterCount();
+    
+    // Update count when filters change
+    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', updateMobileFilterCount);
+    });
+}
+
+function closeMobileFilters() {
+    const filterSidebar = document.querySelector('.filter-sidebar');
+    const filterOverlay = document.querySelector('.filter-overlay');
+    
+    if (filterSidebar) filterSidebar.classList.remove('active');
+    if (filterOverlay) filterOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Close search function
+function closeSearch() {
+    // Clear search input
+    const searchInput = document.querySelector('.global-search-input');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    
+    // Optionally redirect to main page or close search view
+    // window.location.href = "{% url 'home' %}"; // Uncomment if you want to redirect
+}
+
+// Filter functions
+function filterItems(input, type) {
+    const filter = input.value.toUpperCase();
+    const options = document.getElementById(type + '-filters');
+    const labels = options.getElementsByTagName('label');
+    
+    for (let i = 0; i < labels.length; i++) {
+        const label = labels[i];
+        const text = label.textContent || label.innerText;
+        if (text.toUpperCase().indexOf(filter) > -1) {
+            label.style.display = "";
+        } else {
+            label.style.display = "none";
+        }
+    }
+}
+
+function toggleShowMore(type) {
+    const options = document.getElementById(type + '-filters');
+    const btn = event.target;
+    
+    if (options.classList.contains('expanded')) {
+        options.classList.remove('expanded');
+        btn.innerHTML = 'Show More <i class="bi bi-chevron-down"></i>';
+    } else {
+        options.classList.add('expanded');
+        btn.innerHTML = 'Show Less <i class="bi bi-chevron-up"></i>';
+    }
+}
+
+function clearFilters() {
+    document.getElementById('filter-form').reset();
+    const mobileFilterCount = document.getElementById('mobileFilterCount');
+    if (mobileFilterCount) {
+        mobileFilterCount.textContent = '0';
+    }
+    document.getElementById('filter-form').submit();
+}
+
+// Ultra Premium Minimalist Badge Interactions
+document.addEventListener('DOMContentLoaded', function() {
+    // Staggered badge animations
+    const badgeContainers = document.querySelectorAll('.product-badges-container');
+    
+    badgeContainers.forEach((container, index) => {
+        const badges = container.querySelectorAll('.product-badge');
+        badges.forEach((badge, badgeIndex) => {
+            badge.style.animationDelay = `${(index * 0.1) + (badgeIndex * 0.2)}s`;
+        });
+    });
+});
+
+// Premium Zoom Modal JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+    const zoomModal = document.getElementById('zoomModal');
+    const zoomImage = document.getElementById('zoomImage');
+    const zoomProductName = document.getElementById('zoomProductName');
+    const zoomProductPrice = document.getElementById('zoomProductPrice');
+    const zoomCloseBtn = document.getElementById('zoomCloseBtn');
+    const quickViewButtons = document.querySelectorAll('.quick-view-btn');
+    const imageContainer = document.getElementById('zoomImageContainer');
+    
+    // Controls
+    const zoomInBtn = document.getElementById('zoomInBtn');
+    const zoomOutBtn = document.getElementById('zoomOutBtn');
+    const zoomResetBtn = document.getElementById('zoomResetBtn');
+    const zoomResetMini = document.getElementById('zoomResetMini');
+    const zoomFullscreenBtn = document.getElementById('zoomFullscreenBtn');
+    const viewDetailsBtn = document.getElementById('viewDetailsBtn');
+    const navPrev = document.getElementById('navPrev');
+    const navNext = document.getElementById('navNext');
+    
+    let currentScale = 1;
+    let isDragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+    let lastTapTime = 0;
+    let productUrl = '#';
+    let currentProductIndex = 0;
+    let products = [];
+
+    // Initialize products array from page
+    function initProducts() {
+        products = Array.from(document.querySelectorAll('.product-card')).map(card => ({
+            image: card.querySelector('.product-image img').src,
+            name: card.querySelector('.product-name').textContent,
+            price: card.querySelector('.price-current, .price-new')?.textContent || '',
+            url: card.querySelector('.product-link').href
+        }));
+    }
+
+    // Open modal on quick view button click
+    quickViewButtons.forEach((button, index) => {
+        button.addEventListener('click', function() {
+            const productCard = this.closest('.product-card');
+            const productImage = productCard.querySelector('.product-image img');
+            const productName = productCard.querySelector('.product-name').textContent;
+            const productPriceElement = productCard.querySelector('.price-current, .price-new');
+            const productPrice = productPriceElement ? productPriceElement.textContent : '';
+            const productLink = productCard.querySelector('.product-link').href;
+            
+            initProducts();
+            currentProductIndex = index;
+            
+            loadProduct(currentProductIndex);
+            openModal();
+        });
+    });
+    
+    function loadProduct(index) {
+        const product = products[index];
+        zoomImage.src = product.image;
+        zoomImage.alt = product.name;
+        zoomProductName.textContent = product.name;
+        zoomProductPrice.textContent = product.price;
+        productUrl = product.url;
+        viewDetailsBtn.href = productUrl;
+        
+        resetZoom();
+    }
+    
+    function openModal() {
+        zoomModal.classList.add('active');
+        document.body.classList.add('zoom-modal-open');
+        document.body.style.overflow = 'hidden';
+        
+        // Show mobile gesture hint temporarily
+        if (window.innerWidth <= 768) {
+            const gestureHint = document.querySelector('.mobile-gesture-hint');
+            setTimeout(() => {
+                gestureHint.style.display = 'block';
+            }, 500);
+            
+            setTimeout(() => {
+                gestureHint.style.display = 'none';
+            }, 3000);
+        }
+    }
+    
+    // Close modal
+    zoomCloseBtn.addEventListener('click', closeModal);
+    zoomModal.addEventListener('click', function(e) {
+        if (e.target === zoomModal) {
+            closeModal();
+        }
+    });
+    
+    // Keyboard support
+    document.addEventListener('keydown', function(e) {
+        if (zoomModal.classList.contains('active')) {
+            switch(e.key) {
+                case 'Escape':
+                    closeModal();
+                    break;
+                case 'ArrowLeft':
+                    navigateProducts(-1);
+                    break;
+                case 'ArrowRight':
+                    navigateProducts(1);
+                    break;
+                case '+':
+                case '=':
+                    e.preventDefault();
+                    zoomIn();
+                    break;
+                case '-':
+                    e.preventDefault();
+                    zoomOut();
+                    break;
+                case '0':
+                    e.preventDefault();
+                    resetZoom();
+                    break;
+                case 'f':
+                case 'F':
+                    e.preventDefault();
+                    toggleFullscreen();
+                    break;
+            }
+        }
+    });
+    
+    // Navigation
+    navPrev.addEventListener('click', () => navigateProducts(-1));
+    navNext.addEventListener('click', () => navigateProducts(1));
+    
+    function navigateProducts(direction) {
+        currentProductIndex = (currentProductIndex + direction + products.length) % products.length;
+        loadProduct(currentProductIndex);
+    }
+    
+    // Zoom functionality
+    zoomInBtn.addEventListener('click', zoomIn);
+    zoomOutBtn.addEventListener('click', zoomOut);
+    zoomResetBtn.addEventListener('click', resetZoom);
+    zoomResetMini.addEventListener('click', resetZoom);
+    zoomFullscreenBtn.addEventListener('click', toggleFullscreen);
+    
+    function zoomIn() {
+        currentScale = Math.min(currentScale + 0.25, 5);
+        applyZoom();
+    }
+    
+    function zoomOut() {
+        currentScale = Math.max(currentScale - 0.25, 1);
+        applyZoom();
+    }
+    
+    // Mouse wheel zoom
+    imageContainer.addEventListener('wheel', function(e) {
+        e.preventDefault();
+        
+        if (e.deltaY < 0) {
+            zoomIn();
+        } else {
+            zoomOut();
+        }
+    });
+    
+    // Double tap to reset (mobile)
+    imageContainer.addEventListener('touchend', function(e) {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - lastTapTime;
+        
+        if (tapLength < 300 && tapLength > 0) {
+            e.preventDefault();
+            resetZoom();
+        }
+        
+        lastTapTime = currentTime;
+    });
+    
+    // Touch gestures for mobile zoom
+    let initialDistance = null;
+    
+    imageContainer.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            initialDistance = getDistance(e.touches[0], e.touches[1]);
+        }
+    });
+    
+    imageContainer.addEventListener('touchmove', function(e) {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            const currentDistance = getDistance(e.touches[0], e.touches[1]);
+            
+            if (initialDistance !== null) {
+                const scaleFactor = currentDistance / initialDistance;
+                currentScale = Math.min(Math.max(currentScale * scaleFactor, 1), 5);
+                applyZoom();
+                initialDistance = currentDistance;
+            }
+        }
+    });
+    
+    imageContainer.addEventListener('touchend', function() {
+        initialDistance = null;
+    });
+    
+    // Drag functionality
+    imageContainer.addEventListener('mousedown', startDrag);
+    imageContainer.addEventListener('touchstart', startDrag);
+    
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('touchmove', drag);
+    
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('touchend', endDrag);
+    
+    function startDrag(e) {
+        if (currentScale > 1) {
+            isDragging = true;
+            imageContainer.classList.add('zoomed');
+            
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            startX = clientX - imageContainer.getBoundingClientRect().left;
+            startY = clientY - imageContainer.getBoundingClientRect().top;
+            scrollLeft = imageContainer.scrollLeft;
+            scrollTop = imageContainer.scrollTop;
+            
+            if (e.cancelable) e.preventDefault();
+        }
+    }
+    
+    function drag(e) {
+        if (!isDragging) return;
+        
+        const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+        const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+        
+        const x = clientX - imageContainer.getBoundingClientRect().left;
+        const y = clientY - imageContainer.getBoundingClientRect().top;
+        
+        const walkX = (x - startX) * 3;
+        const walkY = (y - startY) * 3;
+        
+        imageContainer.scrollLeft = scrollLeft - walkX;
+        imageContainer.scrollTop = scrollTop - walkY;
+        
+        if (e.cancelable) e.preventDefault();
+    }
+    
+    function endDrag() {
+        isDragging = false;
+        imageContainer.classList.remove('zoomed');
+    }
+    
+    function applyZoom() {
+        zoomImage.style.transform = `scale(${currentScale})`;
+        
+        // Enable/disable buttons
+        zoomOutBtn.disabled = currentScale <= 1;
+        zoomResetBtn.disabled = currentScale === 1;
+        zoomResetMini.disabled = currentScale === 1;
+        
+        // Update cursor
+        imageContainer.style.cursor = currentScale > 1 ? 'grab' : 'zoom-in';
+    }
+    
+    function resetZoom() {
+        currentScale = 1;
+        applyZoom();
+        imageContainer.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+        });
+    }
+    
+    function toggleFullscreen() {
+        zoomModal.classList.toggle('fullscreen');
+        
+        if (zoomModal.classList.contains('fullscreen')) {
+            zoomFullscreenBtn.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
+            zoomFullscreenBtn.title = 'Exit Fullscreen';
+        } else {
+            zoomFullscreenBtn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+            zoomFullscreenBtn.title = 'Fullscreen';
+        }
+    }
+    
+    function closeModal() {
+        zoomModal.classList.remove('active', 'fullscreen');
+        document.body.classList.remove('zoom-modal-open');
+        document.body.style.overflow = '';
+        resetZoom();
+        
+        // Reset fullscreen button
+        zoomFullscreenBtn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i>';
+        zoomFullscreenBtn.title = 'Fullscreen';
+    }
+    
+    function getDistance(touch1, touch2) {
+        return Math.sqrt(
+            Math.pow(touch2.clientX - touch1.clientX, 2) +
+            Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+    }
+    
+    // Prevent elastic scroll on iOS
+    document.addEventListener('touchmove', function(e) {
+        if (zoomModal.classList.contains('active')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+});
+
+// Handle window resize for mobile filters
+window.addEventListener('resize', function() {
+    if (window.innerWidth > 991) {
+        closeMobileFilters();
+    }
+});
+</script>
+
+{% endblock %}

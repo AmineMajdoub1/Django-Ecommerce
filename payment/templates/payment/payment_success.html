@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+  /* Leciselé premium theme for confirmation pages */
+  .success-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh;
+    text-align: center;
+  }
+  .success-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    max-width: 500px;
+    width: 100%;
+  }
+  .success-icon {
+    font-size: 4rem;
+    color: #28a745;
+    margin-bottom: 1rem;
+  }
+  .success-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: #C8A951;
+    margin-bottom: 1rem;
+  }
+  .success-text {
+    font-size: 1.05rem;
+    color: #555;
+    margin-bottom: 2rem;
+  }
+  .btn-lecisele {
+    background-color: transparent;
+    border: 1px solid #C8A951;
+    color: #C8A951;
+    border-radius: 50px;
+    font-weight: 500;
+    padding: 0.6rem 1.8rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  .btn-lecisele:hover {
+    background-color: #C8A951;
+    color: #1C1C1C;
+  }
+</style>
+
+<div class="container success-wrapper">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h1 class="success-title">Payment Successful</h1>
+    <p class="success-text">
+      Thank you for your purchase! Your payment has been processed successfully.<br/>
+      You will receive an email confirmation shortly.
+    </p>
+    <a href="{% url 'home' %}" class="btn-lecisele">Back to Home</a>
+  </div>
+</div>
+
+{% endblock %}
