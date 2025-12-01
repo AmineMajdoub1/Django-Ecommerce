@@ -5,8 +5,11 @@ Deployed to: lecisele.com
 
 from pathlib import Path
 import os
+import sys
+import threading
+import time
 from dotenv import load_dotenv
-import dj_database_url  # For Railway database
+import dj_database_url
 
 # ========== BASE DIRECTORY ==========
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,14 +23,14 @@ else:
     print(">>> No .env file found, using Railway environment variables")
 
 # ========== SECURITY SETTINGS ==========
-SECRET_KEY = os.environ.get('SECRET_KEY', 'fallback-secret-key-change-in-production')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'  # False in production
+SECRET_KEY = os.environ.get('SECRET_KEY', 'change-this-in-production-12345')
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# ALLOWED HOSTS - ADD YOUR DOMAIN HERE
+# ALLOWED HOSTS
 ALLOWED_HOSTS = [
     'lecisele.com',
     'www.lecisele.com',
-    '.up.railway.app',  # Railway domain
+    '.up.railway.app',
     'localhost',
     '127.0.0.1',
 ]
@@ -46,12 +49,7 @@ EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
-
-ADMINS = [
-    ('Site Admin', os.environ.get('ADMIN_EMAIL', 'amine.majdoub02@gmail.com')),
-]
 
 # ========== APPLICATION DEFINITION ==========
 INSTALLED_APPS = [
@@ -61,6 +59,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     
     # Your apps
     'store',
@@ -70,7 +69,6 @@ INSTALLED_APPS = [
     # Third-party apps
     'whitenoise.runserver_nostatic',
     'paypal.standard.ipn',
-    'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -84,7 +82,6 @@ SITE_ID = 1
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # MUST BE HERE for static files
-    
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -101,7 +98,7 @@ ROOT_URLCONF = 'ecom.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -111,6 +108,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'cart.context_processors.cart',
                 'store.context_processors.wishlist_count',
+                'store.context_processors.categories',
             ],
         },
     },
@@ -119,7 +117,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ecom.wsgi.application'
 
 # ========== DATABASE CONFIGURATION ==========
-# FORCE PostgreSQL detection on Railway
+# PostgreSQL on Railway, SQLite locally
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -127,56 +125,29 @@ DATABASES = {
     }
 }
 
-# AGGRESSIVE PostgreSQL detection for Railway
-IS_RAILWAY = os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('RAILWAY_STATIC_URL')
-
-if IS_RAILWAY:
-    print(">>> RAILWAY ENVIRONMENT DETECTED")
-    
-    # Check multiple possible database URL variables
-    DATABASE_URL = None
-    possible_db_vars = ['DATABASE_URL', 'POSTGRES_URL', 'POSTGRESQL_URL']
-    
-    for var in possible_db_vars:
-        if os.environ.get(var):
-            DATABASE_URL = os.environ.get(var)
-            print(f">>> Found database URL in {var}")
-            break
-    
+# Force PostgreSQL on Railway
+if os.environ.get('RAILWAY_ENVIRONMENT') or os.environ.get('DATABASE_URL'):
+    DATABASE_URL = os.environ.get('DATABASE_URL', '')
     if DATABASE_URL:
-        # Fix URL format for dj-database-url
         if DATABASE_URL.startswith('postgres://'):
             DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://')
-            print(">>> Fixed PostgreSQL URL format")
-        
         try:
             DATABASES['default'] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-            print(f">>> SUCCESS: Using PostgreSQL database: {DATABASES['default']['NAME']}")
-            print(f">>> Database engine: {DATABASES['default']['ENGINE']}")
+            print(">>> SUCCESS: Connected to PostgreSQL on Railway")
         except Exception as e:
-            print(f">>> ERROR connecting to PostgreSQL: {e}")
-            print(">>> Falling back to SQLite for now")
+            print(f">>> PostgreSQL error: {e}")
+            print(">>> Using SQLite as fallback")
     else:
-        print(">>> WARNING: No DATABASE_URL found!")
-        print(">>> Please add PostgreSQL database in Railway dashboard")
-        print(">>> Using SQLite temporarily - ADD POSTGRESQL DATABASE!")
+        print(">>> WARNING: No DATABASE_URL found on Railway")
 else:
     print(">>> Local development: Using SQLite")
 
 # ========== PASSWORD VALIDATION ==========
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # ========== INTERNATIONALIZATION ==========
@@ -185,19 +156,20 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ========== STATIC & MEDIA FILES ==========
-# Static files configuration for production
+# ========== STATIC FILES - FIXED FOR PRODUCTION ==========
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Whitenoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+WHITENOISE_ROOT = STATIC_ROOT
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_MANIFEST_STRICT = False
 
-# Media files
+# ========== MEDIA FILES ==========
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -207,77 +179,41 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ========== PAYPAL SETTINGS ==========
 PAYPAL_TEST = os.environ.get('PAYPAL_TEST', 'True') == 'True'
 PAYPAL_RECEIVER_EMAIL = os.environ.get('PAYPAL_RECEIVER_EMAIL', 'business@codemytest.com')
-PAYPAL_CLIENT_ID = os.environ.get('PAYPAL_CLIENT_ID', '')
-PAYPAL_CLIENT_SECRET = os.environ.get('PAYPAL_CLIENT_SECRET', '')
 
 # ========== ALLAUTH SETTINGS ==========
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
-# ========== RAILWAY PRODUCTION SETTINGS ==========
-# Force HTTPS and security on Railway
-if IS_RAILWAY or not DEBUG:
+# ========== PRODUCTION SECURITY ==========
+if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    
-    print(">>> Production security settings enabled")
+    print(">>> Production security enabled")
 
 # ========== AUTO-CREATE ADMIN USER ==========
-# Create admin user automatically on Railway
-if IS_RAILWAY and os.environ.get('CREATE_ADMIN', 'True') == 'True':
+def create_admin_user():
+    """Create admin user after Django is fully loaded"""
+    time.sleep(5)  # Wait for Django to initialize
     try:
-        # Import inside function to avoid circular imports
         from django.contrib.auth import get_user_model
-        from django.db.utils import OperationalError
-        
         User = get_user_model()
-        
-        # Check if admin exists
-        try:
-            if not User.objects.filter(username='admin').exists():
-                print(">>> Creating admin user...")
-                User.objects.create_superuser(
-                    username='admin',
-                    email='admin@lecisele.com',
-                    password='AdminPassword123'
-                )
-                print(">>> Admin user created successfully!")
-            else:
-                print(">>> Admin user already exists")
-        except OperationalError:
-            print(">>> Database not ready yet, skipping admin creation")
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser(
+                username='admin',
+                email='admin@lecisele.com',
+                password='AdminPassword123'
+            )
+            print(">>> ✅ Admin user created successfully!")
+        else:
+            print(">>> ℹ️ Admin user already exists")
     except Exception as e:
-        print(f">>> Error in admin creation: {e}")
+        print(f">>> ⚠️ Admin creation skipped: {str(e)[:100]}")
 
-# ========== FIX PAGINATION WARNING ==========
-# Add default ordering to avoid warning
-SILENCED_SYSTEM_CHECKS = ['models.W042']
-# ========== CREATE ADMIN AFTER SETUP ==========
-import sys
-
-# Only run when starting server
-if "gunicorn" in sys.argv or "runserver" in sys.argv:
-    # Delay import until Django is ready
-    import threading
-    import time
-    
-    def delayed_admin_creation():
-        time.sleep(5)  # Wait for Django to be ready
-        try:
-            from django.contrib.auth import get_user_model
-            User = get_user_model()
-            if not User.objects.filter(username="admin").exists():
-                User.objects.create_superuser("admin", "admin@lecisele.com", "AdminPassword123")
-                print(">>> Admin user created successfully!")
-            else:
-                print(">>> Admin user already exists")
-        except Exception as e:
-            print(f">>> Admin creation skipped: {e}")
-    
-    # Run in background thread
-    thread = threading.Thread(target=delayed_admin_creation, daemon=True)
-    thread.start()
+# Start admin creation in background thread
+if 'gunicorn' in sys.argv or 'runserver' in sys.argv:
+    admin_thread = threading.Thread(target=create_admin_user, daemon=True)
+    admin_thread.start()
