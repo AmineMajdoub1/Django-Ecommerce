@@ -170,7 +170,7 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-# ========== AUTO-CREATE ADMIN, FIX SITE & GOOGLE PROVIDER ==========
+# ========== AUTO-CREATE ADMIN & FIX SITE ==========
 import sys
 
 if os.environ.get('RAILWAY_ENVIRONMENT'):
@@ -178,18 +178,7 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
         import django
         django.setup()
         
-        # 1. FIX: Manually register Google provider if needed
-        try:
-            from allauth.socialaccount import providers
-            from allauth.socialaccount.providers.google.provider import GoogleProvider
-            
-            if 'google' not in providers.registry.get_list():
-                providers.registry.register(GoogleProvider)
-                print("✅ Manually registered Google provider", file=sys.stderr)
-        except Exception as e:
-            print(f"⚠️ Could not register Google provider: {e}", file=sys.stderr)
-        
-        # 2. Create admin user if doesn't exist
+        # 1. Create admin user if doesn't exist
         from django.contrib.auth import get_user_model
         User = get_user_model()
         if not User.objects.filter(username='admin').exists():
@@ -202,7 +191,7 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
         else:
             print("✅ Admin user already exists", file=sys.stderr)
         
-        # 3. FIX SITE CONFIGURATION (CRITICAL!)
+        # 2. FIX SITE CONFIGURATION (CRITICAL!)
         from django.contrib.sites.models import Site
         
         # Get or create site with ID=1
@@ -217,25 +206,6 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
             site.name = 'lecisele.com'
             site.save()
             print("✅ Updated site from example.com to lecisele.com", file=sys.stderr)
-            
-        # 4. AUTO-CREATE GOOGLE SOCIALAPP (OPTIONAL - can do manually)
-        # Uncomment if you want to auto-create
-        '''
-        try:
-            from allauth.socialaccount.models import SocialApp
-            if not SocialApp.objects.filter(provider='google').exists():
-                app = SocialApp.objects.create(
-                    provider='google',
-                    name='Google',
-                    client_id='YOUR_CLIENT_ID_HERE',
-                    secret='YOUR_SECRET_HERE',
-                    key='YOUR_KEY_HERE',
-                )
-                app.sites.add(site)
-                print("✅ Auto-created Google SocialApp", file=sys.stderr)
-        except Exception as e:
-            print(f"⚠️ Could not create Google SocialApp: {e}", file=sys.stderr)
-        '''
             
     except Exception as e:
         print(f"⚠️ Startup error: {e}", file=sys.stderr)
