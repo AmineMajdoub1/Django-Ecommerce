@@ -11,8 +11,8 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ========== SECURITY SETTINGS ==========
-# CHANGE THIS TO True TEMPORARILY TO SEE ERRORS, THEN BACK TO False
-DEBUG = True  # TEMPORARY: Set to True to see errors, then change to False
+# SET TO True TO SEE ERRORS, CHANGE TO False AFTER SITE WORKS
+DEBUG = True  # TEMPORARY - Change to False after site works
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-production-12345')
 
@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'sorl.thumbnail',
+    # REMOVED: 'debug_toolbar',  # Remove for production
 ]
 
 SITE_ID = 1
@@ -72,6 +73,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'store.social_cart_middleware.SocialLoginCartMiddleware',
+    # REMOVED: 'debug_toolbar.middleware.DebugToolbarMiddleware',  # Remove for production
 ]
 
 # ========== URL & TEMPLATE CONFIGURATION ==========
@@ -99,10 +101,9 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ecom.wsgi.application'
 
 # ========== DATABASE CONFIGURATION ==========
-# SIMPLE DATABASE SETUP FOR RAILWAY
 DATABASES = {
     'default': dj_database_url.config(
-        default='sqlite:///db.sqlite3',  # Default to SQLite if no DATABASE_URL
+        default='sqlite:///db.sqlite3',
         conn_max_age=600,
         ssl_require=True
     )
