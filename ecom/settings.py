@@ -169,3 +169,45 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
+# ========== AUTO-CREATE ADMIN & FIX SOCIALAPP ==========
+import sys
+
+if os.environ.get('RAILWAY_ENVIRONMENT'):
+    try:
+        import django
+        django.setup()
+        
+        # 1. Create admin user if doesn't exist
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser(
+                username='admin',
+                email='admin@lecisele.com',
+                password='admin123'  # CHANGE THIS PASSWORD!
+            )
+            print("✅ Admin user created: admin / admin123", file=sys.stderr)
+        else:
+            print("✅ Admin user already exists", file=sys.stderr)
+        
+        # 2. Create dummy Google SocialApp to fix 500 error
+        from allauth.socialaccount.models import SocialApp
+        from django.contrib.sites.models import Site
+        
+        site = Site.objects.get(id=1)
+        
+        if not SocialApp.objects.filter(provider='google').exists():
+            app = SocialApp.objects.create(
+                provider='google',
+                name='Google',
+                client_id='dummy-client-id',
+                secret='dummy-secret-key',
+            )
+            app.sites.add(site)
+            print("✅ Dummy Google SocialApp created", file=sys.stderr)
+        else:
+            print("✅ Google SocialApp already exists", file=sys.stderr)
+            
+    except Exception as e:
+        print(f"⚠️ Startup error: {e}", file=sys.stderr)
