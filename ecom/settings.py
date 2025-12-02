@@ -170,7 +170,7 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-# ========== AUTO-CREATE ADMIN & FIX SITE ==========
+# ========== AUTO-CREATE ADMIN, FIX SITE & GOOGLE SOCIALAPP ==========
 import sys
 
 if os.environ.get('RAILWAY_ENVIRONMENT'):
@@ -206,6 +206,34 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
             site.name = 'lecisele.com'
             site.save()
             print("✅ Updated site from example.com to lecisele.com", file=sys.stderr)
+        
+        # 3. CREATE GOOGLE SOCIALAPP IF ENVIRONMENT VARIABLES EXIST
+        from allauth.socialaccount.models import SocialApp
+        
+        # Get credentials from Railway environment variables
+        GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+        GOOGLE_SECRET_KEY = os.environ.get('GOOGLE_SECRET_KEY')
+        
+        if GOOGLE_CLIENT_ID and GOOGLE_SECRET_KEY:
+            # Delete any existing Google apps
+            SocialApp.objects.filter(provider='google').delete()
+            
+            # Create Google SocialApp
+            app = SocialApp.objects.create(
+                provider='google',
+                name='Google',
+                client_id=GOOGLE_CLIENT_ID,
+                secret=GOOGLE_SECRET_KEY,
+                key=GOOGLE_SECRET_KEY,
+            )
+            app.sites.add(site)
+            app.save()
+            
+            print("✅ Google SocialApp created using Railway variables", file=sys.stderr)
+        else:
+            print("⚠️ Google OAuth credentials not set in Railway variables", file=sys.stderr)
+            print("⚠️ Add GOOGLE_CLIENT_ID and GOOGLE_SECRET_KEY in Railway dashboard", file=sys.stderr)
+            print("⚠️ Or add Google SocialApp manually in Django Admin", file=sys.stderr)
             
     except Exception as e:
         print(f"⚠️ Startup error: {e}", file=sys.stderr)
