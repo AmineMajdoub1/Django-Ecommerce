@@ -170,7 +170,7 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-# ========== AUTO-CREATE ADMIN & FIX SOCIALAPP ==========
+# ========== AUTO-CREATE ADMIN & FIX SITE ==========
 import sys
 
 if os.environ.get('RAILWAY_ENVIRONMENT'):
@@ -191,23 +191,21 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
         else:
             print("✅ Admin user already exists", file=sys.stderr)
         
-        # 2. Create dummy Google SocialApp to fix 500 error
-        from allauth.socialaccount.models import SocialApp
+        # 2. FIX SITE CONFIGURATION (CRITICAL!)
         from django.contrib.sites.models import Site
         
-        site = Site.objects.get(id=1)
+        # Get or create site with ID=1
+        site, created = Site.objects.get_or_create(
+            id=1,
+            defaults={'domain': 'lecisele.com', 'name': 'lecisele.com'}
+        )
         
-        if not SocialApp.objects.filter(provider='google').exists():
-            app = SocialApp.objects.create(
-                provider='google',
-                name='Google',
-                client_id='dummy-client-id',
-                secret='dummy-secret-key',
-            )
-            app.sites.add(site)
-            print("✅ Dummy Google SocialApp created", file=sys.stderr)
-        else:
-            print("✅ Google SocialApp already exists", file=sys.stderr)
+        # Fix if it's still example.com
+        if site.domain == 'example.com':
+            site.domain = 'lecisele.com'
+            site.name = 'lecisele.com'
+            site.save()
+            print("✅ Updated site from example.com to lecisele.com", file=sys.stderr)
             
     except Exception as e:
         print(f"⚠️ Startup error: {e}", file=sys.stderr)
