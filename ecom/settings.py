@@ -1,39 +1,37 @@
 """
 Django settings for ecom project on Railway.
-Deployed to: lecisele.com
 """
 
 from pathlib import Path
 import os
 import dj_database_url
+import sys
 
-# ========== BASE DIRECTORY ==========
+# ========= BASE DIR ==========
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ========== SECURITY SETTINGS ==========
-# SET TO True TO SEE ERRORS, CHANGE TO False AFTER SITE WORKS
-DEBUG = True  # TEMPORARY - Change to False after site works
+# ========= SECURITY ==========
+DEBUG = True  # Set to FALSE after everything works
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-production-12345')
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-temp-key-change-in-production')
 
-# ========== ALLOWED HOSTS ==========
+# ========= ALLOWED HOSTS ==========
 ALLOWED_HOSTS = [
     'lecisele.com',
     'www.lecisele.com',
     '.up.railway.app',
     'localhost',
-    '127.0.0.1',
-    '*',  # TEMPORARY - REMOVE WHEN SITE WORKS
+    '*'
 ]
 
-# ========== CSRF PROTECTION ==========
+# ========= CSRF ==========
 CSRF_TRUSTED_ORIGINS = [
     'https://lecisele.com',
     'https://www.lecisele.com',
     'https://*.up.railway.app',
 ]
 
-# ========== APPLICATION DEFINITION ==========
+# ========= INSTALLED APPS ==========
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,13 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    
-    # Your apps
+
+    # apps
     'store',
     'cart',
     'payment',
-    
-    # Third-party apps
+
+    # third-party
     'whitenoise.runserver_nostatic',
     'paypal.standard.ipn',
     'allauth',
@@ -56,12 +54,11 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'sorl.thumbnail',
-    # REMOVED: 'debug_toolbar',  # Remove for production
 ]
 
 SITE_ID = 1
 
-# ========== MIDDLEWARE ==========
+# ========= MIDDLEWARE ==========
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -73,10 +70,9 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
     'store.social_cart_middleware.SocialLoginCartMiddleware',
-    # REMOVED: 'debug_toolbar.middleware.DebugToolbarMiddleware',  # Remove for production
 ]
 
-# ========== URL & TEMPLATE CONFIGURATION ==========
+# ========= TEMPLATES ==========
 ROOT_URLCONF = 'ecom.urls'
 
 TEMPLATES = [
@@ -100,7 +96,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ecom.wsgi.application'
 
-# ========== DATABASE CONFIGURATION ==========
+# ========= DATABASE ==========
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
@@ -109,7 +105,7 @@ DATABASES = {
     )
 }
 
-# ========== PASSWORD VALIDATION ==========
+# ========= PASSWORDS ==========
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -117,41 +113,38 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ========== INTERNATIONALIZATION ==========
+# ========= I18N ==========
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ========== STATIC FILES ==========
+# ========= STATIC ==========
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# ========== MEDIA FILES ==========
+# ========= MEDIA ==========
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# ========== DEFAULT PRIMARY KEY ==========
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ========== ALLAUTH SETTINGS ==========
+# ========= ALLAUTH ==========
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 
-# ========== PAYPAL SETTINGS ==========
+# ========= PAYPAL ==========
 PAYPAL_TEST = True
 PAYPAL_RECEIVER_EMAIL = 'business@codemytest.com'
 
-# ========== LOGGING FOR DEBUGGING ==========
+# ========= LOGGING ==========
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
+        'console': {'class': 'logging.StreamHandler'},
     },
     'root': {
         'handlers': ['console'],
@@ -159,8 +152,7 @@ LOGGING = {
     },
 }
 
-# ========== PRODUCTION SECURITY ==========
-# ONLY ENABLE WHEN DEBUG = False
+# ========= PRODUCTION SECURITY ==========
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -170,70 +162,51 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-# ========== AUTO-CREATE ADMIN, FIX SITE & GOOGLE SOCIALAPP ==========
-import sys
 
+# ========= RAILWAY AUTO FIX (ADMIN + SITE + GOOGLE) ==========
 if os.environ.get('RAILWAY_ENVIRONMENT'):
     try:
         import django
         django.setup()
-        
-        # 1. Create admin user if doesn't exist
+
         from django.contrib.auth import get_user_model
         User = get_user_model()
+
+        # Create admin user
         if not User.objects.filter(username='admin').exists():
             User.objects.create_superuser(
                 username='admin',
                 email='admin@lecisele.com',
-                password='admin123'  # CHANGE THIS PASSWORD!
+                password='admin123'
             )
-            print("✅ Admin user created: admin / admin123", file=sys.stderr)
-        else:
-            print("✅ Admin user already exists", file=sys.stderr)
-        
-        # 2. FIX SITE CONFIGURATION (CRITICAL!)
+            print("Admin auto-created", file=sys.stderr)
+
+        # Fix site
         from django.contrib.sites.models import Site
-        
-        # Get or create site with ID=1
-        site, created = Site.objects.get_or_create(
+        site, _ = Site.objects.get_or_create(
             id=1,
             defaults={'domain': 'lecisele.com', 'name': 'lecisele.com'}
         )
-        
-        # Fix if it's still example.com
-        if site.domain == 'example.com':
-            site.domain = 'lecisele.com'
-            site.name = 'lecisele.com'
-            site.save()
-            print("✅ Updated site from example.com to lecisele.com", file=sys.stderr)
-        
-        # 3. CREATE GOOGLE SOCIALAPP IF ENVIRONMENT VARIABLES EXIST
+        site.domain = 'lecisele.com'
+        site.name = 'lecisele.com'
+        site.save()
+
+        # Create Google SocialApp from Railway variables
         from allauth.socialaccount.models import SocialApp
-        
-        # Get credentials from Railway environment variables
+
         GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
         GOOGLE_SECRET_KEY = os.environ.get('GOOGLE_SECRET_KEY')
-        
+
         if GOOGLE_CLIENT_ID and GOOGLE_SECRET_KEY:
-            # Delete any existing Google apps
             SocialApp.objects.filter(provider='google').delete()
-            
-            # Create Google SocialApp
             app = SocialApp.objects.create(
                 provider='google',
                 name='Google',
                 client_id=GOOGLE_CLIENT_ID,
-                secret=GOOGLE_SECRET_KEY,
-                key=GOOGLE_SECRET_KEY,
+                secret=Google_SECRET_KEY,
             )
             app.sites.add(site)
-            app.save()
-            
-            print("✅ Google SocialApp created using Railway variables", file=sys.stderr)
-        else:
-            print("⚠️ Google OAuth credentials not set in Railway variables", file=sys.stderr)
-            print("⚠️ Add GOOGLE_CLIENT_ID and GOOGLE_SECRET_KEY in Railway dashboard", file=sys.stderr)
-            print("⚠️ Or add Google SocialApp manually in Django Admin", file=sys.stderr)
-            
+            print("Google OAuth App created", file=sys.stderr)
+
     except Exception as e:
-        print(f"⚠️ Startup error: {e}", file=sys.stderr)
+        print(f"Error in Railway setup: {e}", file=sys.stderr)
