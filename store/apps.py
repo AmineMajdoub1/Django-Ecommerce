@@ -11,8 +11,6 @@ class StoreConfig(AppConfig):
             return
 
         try:
-            import django
-            django.setup()
             from django.contrib.sites.models import Site
             from allauth.socialaccount.models import SocialApp
 
