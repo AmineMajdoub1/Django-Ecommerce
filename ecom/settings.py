@@ -203,7 +203,7 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
                 provider='google',
                 name='Google',
                 client_id=GOOGLE_CLIENT_ID,
-                secret=Google_SECRET_KEY,
+                secret=GOOGLE_SECRET_KEY,
             )
             app.sites.add(site)
             print("Google OAuth App created", file=sys.stderr)
