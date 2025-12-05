@@ -5,12 +5,14 @@ from django.db.models.signals import post_save
 from django.utils import timezone
 from django.conf import settings
 from PIL import Image
+from io import BytesIO
+import cloudinary.uploader
 
 
 # Create Customer Profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    date_modified = models.DateTimeField(User, auto_now=True)
+    date_modified = models.DateTimeField(auto_now=True)  # FIXED: removed User parameter
     phone = models.CharField(max_length=20, blank=True)
     address1 = models.CharField(max_length=200, blank=True)
     address2 = models.CharField(max_length=200, blank=True)
@@ -40,22 +42,49 @@ class Category(models.Model):
     image = models.ImageField(upload_to='uploads/category/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        super(Category, self).save(*args, **kwargs)
+        # Save first to get the image
+        super().save(*args, **kwargs)
+        
+        # Resize image after save (works with Cloudinary)
         if self.image:
-            self.resize_image(self.image.path)
+            try:
+                self.resize_and_upload_image()
+            except Exception as e:
+                print(f"Error resizing category image: {e}")
 
-    def resize_image(self, image_path):
-        img = Image.open(image_path)
-        if img.mode != "RGB":
-            img = img.convert("RGB")
-
-        max_size = (1080, 1080)  # Resize limit
-
-        img.thumbnail(max_size, Image.Resampling.LANCZOS)  # FIXED
-
-        img.save(image_path, quality=70, optimize=True)
-    
-
+    def resize_and_upload_image(self):
+        """Resize and upload image for Cloudinary storage"""
+        try:
+            # Open image from the uploaded file
+            img = Image.open(self.image)
+            
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            
+            # Resize
+            max_size = (1080, 1080)
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            # Save to memory
+            temp_image = BytesIO()
+            img.save(temp_image, format='JPEG', quality=70, optimize=True)
+            temp_image.seek(0)
+            
+            # Upload to Cloudinary
+            result = cloudinary.uploader.upload(
+                temp_image,
+                folder="categories/",
+                public_id=f"category_{self.id}",
+                overwrite=True,
+                resource_type="image"
+            )
+            
+            # Note: With Cloudinary, the image is already uploaded
+            # We don't need to update the field as Cloudinary handles storage
+            
+        except Exception as e:
+            print(f"Error in resize_and_upload_image for category: {e}")
+            # Don't break if resizing fails
 
     def __str__(self):
         return self.name
@@ -107,32 +136,67 @@ class Product(models.Model):
     # Head sizes for products that require size selection
     head_sizes = models.ManyToManyField(HeadSize, blank=True)
     allow_custom_size = models.BooleanField(default=False)
-
     sale_price = models.DecimalField(default=0, decimal_places=2, max_digits=6)
+
+    def save(self, *args, **kwargs):
+        # Save first
+        super().save(*args, **kwargs)
+        
+        # Resize images after save
+        self.resize_all_images()
+    
+    def resize_all_images(self):
+        """Resize all product images"""
+        image_fields = [self.image]
+        if self.extra_image1:
+            image_fields.append(self.extra_image1)
+        if self.extra_image2:
+            image_fields.append(self.extra_image2)
+        
+        for i, image_field in enumerate(image_fields):
+            if image_field:
+                try:
+                    self.resize_product_image(image_field, i)
+                except Exception as e:
+                    print(f"Error resizing product image {i}: {e}")
+    
+    def resize_product_image(self, image_field, index=0):
+        """Resize and upload a single product image"""
+        try:
+            # Open image
+            img = Image.open(image_field)
+            
+            if img.mode != "RGB":
+                img = img.convert("RGB")
+            
+            # Resize
+            max_size = (1080, 1080)
+            img.thumbnail(max_size, Image.Resampling.LANCZOS)
+            
+            # Save to memory
+            temp_image = BytesIO()
+            img.save(temp_image, format='JPEG', quality=70, optimize=True)
+            temp_image.seek(0)
+            
+            # Upload to Cloudinary with appropriate folder
+            folder = "products/"
+            public_id = f"product_{self.id}"
+            if index > 0:
+                public_id = f"product_{self.id}_extra_{index}"
+            
+            result = cloudinary.uploader.upload(
+                temp_image,
+                folder=folder,
+                public_id=public_id,
+                overwrite=True,
+                resource_type="image"
+            )
+            
+        except Exception as e:
+            print(f"Error in resize_product_image: {e}")
 
     def __str__(self):
         return self.name
-
-    def save(self, *args, **kwargs):
-        super(Product, self).save(*args, **kwargs)
-        if self.image:
-            self.resize_image(self.image.path)
-        if self.extra_image1:
-            self.resize_image(self.extra_image1.path)
-        if self.extra_image2:
-            self.resize_image(self.extra_image2.path)
-
-    def resize_image(self, image_path):
-        img = Image.open(image_path)
-        if img.mode != "RGB":
-            img = img.convert("RGB")
-
-        max_size = (1080, 1080)  # Resize limit
-
-        img.thumbnail(max_size, Image.Resampling.LANCZOS)  # FIXED
-
-        img.save(image_path, quality=70, optimize=True)
-
 
 
 class ContactMessage(models.Model):
