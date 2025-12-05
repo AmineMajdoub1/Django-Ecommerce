@@ -1,4 +1,6 @@
 from django.apps import AppConfig
+import allauth.socialaccount.providers.google
+
 import os
 
 class StoreConfig(AppConfig):

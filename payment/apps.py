@@ -1,5 +1,4 @@
 from django.apps import AppConfig
-import allauth.socialaccount.providers.google
 
 
 class PaymentConfig(AppConfig):
