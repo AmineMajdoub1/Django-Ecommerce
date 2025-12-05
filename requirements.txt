@@ -7,7 +7,7 @@ gunicorn==22.0.0
 idna==3.7
 packaging==24.1
 Pillow==10.0.0
-psycopg2==2.9.9
+psycopg2-binary==2.9.9  # Use only this, remove psycopg2==2.9.9
 python-dotenv==1.0.1
 pytz==2024.1
 requests==2.32.3
@@ -17,8 +17,6 @@ tzdata==2023.3
 urllib3==2.2.2
 whitenoise==6.6.0
 dj-database-url==2.1.0
-django-allauth[google]==0.63.1
+django-allauth==0.63.1
 sorl-thumbnail==12.10.0
-Pillow==10.0.0
-psycopg2-binary==2.9.9
 PyJWT==1.7.1

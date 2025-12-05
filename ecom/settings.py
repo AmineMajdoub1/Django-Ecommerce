@@ -169,6 +169,7 @@ if not DEBUG:
 
 
 # ========= RAILWAY AUTO FIX (ADMIN + SITE + GOOGLE) ==========
+# ========= RAILWAY AUTO FIX (ADMIN + SITE + GOOGLE) ==========
 if os.environ.get('RAILWAY_ENVIRONMENT'):
     try:
         import django
@@ -196,6 +197,14 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
         site.name = 'lecisele.com'
         site.save()
 
+        # IMPORTANT: Force Google provider registration first
+        from allauth.socialaccount import providers
+        from allauth.socialaccount.providers.google import provider as google_provider
+        
+        if 'google' not in providers.registry.get_class_list():
+            providers.registry.register(google_provider.GoogleProvider)
+            print("Google provider registered", file=sys.stderr)
+
         # Create Google SocialApp from Railway variables
         from allauth.socialaccount.models import SocialApp
 
@@ -203,7 +212,9 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
         GOOGLE_SECRET_KEY = os.environ.get('GOOGLE_SECRET_KEY')
 
         if GOOGLE_CLIENT_ID and GOOGLE_SECRET_KEY:
+            # Delete existing Google apps to avoid duplicates
             SocialApp.objects.filter(provider='google').delete()
+            
             app = SocialApp.objects.create(
                 provider='google',
                 name='Google',
@@ -215,3 +226,17 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
 
     except Exception as e:
         print(f"Error in Railway setup: {e}", file=sys.stderr)
+# ========= FORCE GOOGLE PROVIDER REGISTRATION ==========
+try:
+    # Force registration of Google provider
+    from allauth.socialaccount import providers
+    from allauth.socialaccount.providers.google import provider
+    
+    # Manually register Google provider if not already registered
+    if 'google' not in providers.registry.get_class_list():
+        providers.registry.register(provider.GoogleProvider)
+        print("Google provider manually registered", file=sys.stderr)
+except ImportError as e:
+    print(f"Error importing Google provider: {e}", file=sys.stderr)
+except Exception as e:
+    print(f"Error registering Google provider: {e}", file=sys.stderr)
