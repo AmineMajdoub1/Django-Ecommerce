@@ -12,7 +12,7 @@ import cloudinary.uploader
 # Create Customer Profile
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    date_modified = models.DateTimeField(auto_now=True)  # FIXED: removed User parameter
+    date_modified = models.DateTimeField(auto_now=True)
     phone = models.CharField(max_length=20, blank=True)
     address1 = models.CharField(max_length=200, blank=True)
     address2 = models.CharField(max_length=200, blank=True)
@@ -42,49 +42,54 @@ class Category(models.Model):
     image = models.ImageField(upload_to='uploads/category/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # Save first to get the image
-        super().save(*args, **kwargs)
+        # Check if image is being updated
+        if self.image and hasattr(self.image, 'file'):
+            self.compress_image_before_save()
         
-        # Resize image after save (works with Cloudinary)
-        if self.image:
-            try:
-                self.resize_and_upload_image()
-            except Exception as e:
-                print(f"Error resizing category image: {e}")
+        super().save(*args, **kwargs)
 
-    def resize_and_upload_image(self):
-        """Resize and upload image for Cloudinary storage"""
+    def compress_image_before_save(self):
+        """Compress image to under 10MB before saving"""
         try:
-            # Open image from the uploaded file
-            img = Image.open(self.image)
+            # Open the uploaded image
+            img = Image.open(self.image.file)
             
+            # Convert to RGB if necessary
             if img.mode != "RGB":
                 img = img.convert("RGB")
             
-            # Resize
-            max_size = (1080, 1080)
+            # Resize if too large
+            max_size = (1920, 1920)  # Max dimensions
             img.thumbnail(max_size, Image.Resampling.LANCZOS)
             
-            # Save to memory
+            # Compress to reduce file size
             temp_image = BytesIO()
-            img.save(temp_image, format='JPEG', quality=70, optimize=True)
-            temp_image.seek(0)
             
-            # Upload to Cloudinary
-            result = cloudinary.uploader.upload(
-                temp_image,
-                folder="categories/",
-                public_id=f"category_{self.id}",
-                overwrite=True,
-                resource_type="image"
-            )
+            # Start with high quality and reduce until under 9MB
+            quality = 85
+            max_file_size = 9 * 1024 * 1024  # 9MB (leave 1MB buffer)
             
-            # Note: With Cloudinary, the image is already uploaded
-            # We don't need to update the field as Cloudinary handles storage
+            while quality > 10:
+                temp_image.seek(0)
+                temp_image.truncate(0)
+                
+                # Save with current quality
+                img.save(temp_image, format='JPEG', quality=quality, optimize=True)
+                
+                # Check file size
+                if temp_image.tell() <= max_file_size:
+                    break
+                
+                # Reduce quality for next iteration
+                quality -= 15
+            
+            # Replace the image file with compressed version
+            self.image.file = temp_image
+            self.image.file.seek(0)
             
         except Exception as e:
-            print(f"Error in resize_and_upload_image for category: {e}")
-            # Don't break if resizing fails
+            print(f"Error compressing image: {e}")
+            # Continue with original image if compression fails
 
     def __str__(self):
         return self.name
@@ -129,71 +134,66 @@ class Product(models.Model):
     extra_image1 = models.ImageField(upload_to='uploads/product/', blank=True, null=True)
     extra_image2 = models.ImageField(upload_to='uploads/product/', blank=True, null=True)
     is_sale = models.BooleanField(default=False)
-    # Product is sold out
     sold_out = models.BooleanField(default=False)
-    # Product is unique
     is_unique = models.BooleanField(default=False)
-    # Head sizes for products that require size selection
     head_sizes = models.ManyToManyField(HeadSize, blank=True)
     allow_custom_size = models.BooleanField(default=False)
     sale_price = models.DecimalField(default=0, decimal_places=2, max_digits=6)
 
     def save(self, *args, **kwargs):
-        # Save first
+        # Compress images before saving
+        self.compress_all_images()
         super().save(*args, **kwargs)
+
+    def compress_all_images(self):
+        """Compress all product images before upload"""
+        image_fields = [
+            ('image', self.image),
+            ('extra_image1', self.extra_image1),
+            ('extra_image2', self.extra_image2)
+        ]
         
-        # Resize images after save
-        self.resize_all_images()
-    
-    def resize_all_images(self):
-        """Resize all product images"""
-        image_fields = [self.image]
-        if self.extra_image1:
-            image_fields.append(self.extra_image1)
-        if self.extra_image2:
-            image_fields.append(self.extra_image2)
-        
-        for i, image_field in enumerate(image_fields):
-            if image_field:
-                try:
-                    self.resize_product_image(image_field, i)
-                except Exception as e:
-                    print(f"Error resizing product image {i}: {e}")
-    
-    def resize_product_image(self, image_field, index=0):
-        """Resize and upload a single product image"""
+        for field_name, image_field in image_fields:
+            if image_field and hasattr(image_field, 'file'):
+                self.compress_product_image(image_field)
+
+    def compress_product_image(self, image_field):
+        """Compress a single product image"""
         try:
-            # Open image
-            img = Image.open(image_field)
+            # Open the uploaded image
+            img = Image.open(image_field.file)
             
+            # Convert to RGB if necessary
             if img.mode != "RGB":
                 img = img.convert("RGB")
             
-            # Resize
-            max_size = (1080, 1080)
+            # Resize if too large
+            max_size = (1920, 1920)
             img.thumbnail(max_size, Image.Resampling.LANCZOS)
             
-            # Save to memory
+            # Compress to reduce file size
             temp_image = BytesIO()
-            img.save(temp_image, format='JPEG', quality=70, optimize=True)
-            temp_image.seek(0)
             
-            # Upload to Cloudinary with appropriate folder
-            folder = "products/"
-            public_id = f"product_{self.id}"
-            if index > 0:
-                public_id = f"product_{self.id}_extra_{index}"
+            quality = 85
+            max_file_size = 9 * 1024 * 1024  # 9MB
             
-            result = cloudinary.uploader.upload(
-                temp_image,
-                folder=folder,
-                public_id=public_id,
-                overwrite=True,
-                resource_type="image"
-            )
+            while quality > 10:
+                temp_image.seek(0)
+                temp_image.truncate(0)
+                
+                img.save(temp_image, format='JPEG', quality=quality, optimize=True)
+                
+                if temp_image.tell() <= max_file_size:
+                    break
+                
+                quality -= 15
+            
+            # Replace the image file
+            image_field.file = temp_image
+            image_field.file.seek(0)
             
         except Exception as e:
-            print(f"Error in resize_product_image: {e}")
+            print(f"Error compressing product image: {e}")
 
     def __str__(self):
         return self.name
