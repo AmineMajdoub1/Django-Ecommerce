@@ -176,6 +176,7 @@ if not DEBUG:
 
 # ========= RAILWAY AUTO FIX (ADMIN + SITE + GOOGLE) ==========
 # ========= RAILWAY AUTO FIX (ADMIN + SITE + GOOGLE) ==========
+# ========= RAILWAY AUTO FIX (ADMIN + SITE + GOOGLE) ==========
 if os.environ.get('RAILWAY_ENVIRONMENT'):
     try:
         import django
@@ -211,28 +212,41 @@ if os.environ.get('RAILWAY_ENVIRONMENT'):
             providers.registry.register(google_provider.GoogleProvider)
             print("Google provider registered", file=sys.stderr)
 
-        # Create Google SocialApp from Railway variables
+        # Create Google SocialApp from Railway variables - FIXED TO PREVENT DUPLICATES
         from allauth.socialaccount.models import SocialApp
 
         GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
         GOOGLE_SECRET_KEY = os.environ.get('GOOGLE_SECRET_KEY')
 
         if GOOGLE_CLIENT_ID and GOOGLE_SECRET_KEY:
-            # Delete existing Google apps to avoid duplicates
-            SocialApp.objects.filter(provider='google').delete()
+            # Check if a Google app already exists
+            existing_apps = SocialApp.objects.filter(provider='google')
             
-            app = SocialApp.objects.create(
-                provider='google',
-                name='Google',
-                client_id=GOOGLE_CLIENT_ID,
-                secret=GOOGLE_SECRET_KEY,
-            )
-            app.sites.add(site)
-            print("Google OAuth App created", file=sys.stderr)
+            if existing_apps.exists():
+                # Update existing app
+                app = existing_apps.first()
+                app.client_id = GOOGLE_CLIENT_ID
+                app.secret = GOOGLE_SECRET_KEY
+                app.name = 'Google'
+                app.save()
+                
+                # Clear and set sites
+                app.sites.clear()
+                app.sites.add(site)
+                print("Google OAuth App updated", file=sys.stderr)
+            else:
+                # Create new app
+                app = SocialApp.objects.create(
+                    provider='google',
+                    name='Google',
+                    client_id=GOOGLE_CLIENT_ID,
+                    secret=GOOGLE_SECRET_KEY,
+                )
+                app.sites.add(site)
+                print("Google OAuth App created", file=sys.stderr)
 
     except Exception as e:
-        print(f"Error in Railway setup: {e}", file=sys.stderr)
-# ========= FORCE GOOGLE PROVIDER REGISTRATION ==========
+        print(f"Error in Railway setup: {e}", file=sys.stderr)# ========= FORCE GOOGLE PROVIDER REGISTRATION ==========
 try:
     # Force registration of Google provider
     from allauth.socialaccount import providers
