@@ -1,7 +1,8 @@
 """
 Django settings for ecom project on Railway.
 """
-
+# Force Allauth Google provider import
+import allauth.socialaccount.providers.google
 from pathlib import Path
 import os
 import dj_database_url
@@ -166,12 +167,51 @@ if not DEBUG:
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "APP": {
-            "client_id": "",
-            "secret": "",
-            "key": ""
-        }
-    }
-}
+
+# ========= RAILWAY AUTO FIX (ADMIN + SITE + GOOGLE) ==========
+if os.environ.get('RAILWAY_ENVIRONMENT'):
+    try:
+        import django
+        django.setup()
+
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        # Create admin user
+        if not User.objects.filter(username='admin').exists():
+            User.objects.create_superuser(
+                username='admin',
+                email='admin@lecisele.com',
+                password='admin123'
+            )
+            print("Admin auto-created", file=sys.stderr)
+
+        # Fix site
+        from django.contrib.sites.models import Site
+        site, _ = Site.objects.get_or_create(
+            id=1,
+            defaults={'domain': 'lecisele.com', 'name': 'lecisele.com'}
+        )
+        site.domain = 'lecisele.com'
+        site.name = 'lecisele.com'
+        site.save()
+
+        # Create Google SocialApp from Railway variables
+        from allauth.socialaccount.models import SocialApp
+
+        GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')
+        GOOGLE_SECRET_KEY = os.environ.get('GOOGLE_SECRET_KEY')
+
+        if GOOGLE_CLIENT_ID and GOOGLE_SECRET_KEY:
+            SocialApp.objects.filter(provider='google').delete()
+            app = SocialApp.objects.create(
+                provider='google',
+                name='Google',
+                client_id=GOOGLE_CLIENT_ID,
+                secret=GOOGLE_SECRET_KEY,
+            )
+            app.sites.add(site)
+            print("Google OAuth App created", file=sys.stderr)
+
+    except Exception as e:
+        print(f"Error in Railway setup: {e}", file=sys.stderr)
