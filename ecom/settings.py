@@ -12,7 +12,7 @@ import sys
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ========= SECURITY ==========
-DEBUG = True  # Set to FALSE after everything works
+DEBUG = False  # Set to FALSE after everything works
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-temp-key-change-in-production')
 
