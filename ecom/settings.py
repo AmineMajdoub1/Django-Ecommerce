@@ -16,6 +16,10 @@ DEBUG = False  # Set to FALSE after everything works
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-temp-key-change-in-production')
 
+# Add to settings.py before the ALLAUTH section
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
 # ========= ALLOWED HOSTS ==========
 ALLOWED_HOSTS = [
     'lecisele.com',
